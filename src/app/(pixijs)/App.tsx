@@ -2,10 +2,10 @@
 
 import { Application, ApplicationRef, extend } from "@pixi/react";
 import { Container, Graphics, Sprite, AnimatedSprite } from "pixi.js";
-import { BackgroundSprite } from "./sprites/BackgroundSprite";
+import { BackgroundSprite } from "./components/sprites/BackgroundSprite";
 import { useRef, useEffect } from "react";
 import { MAX_SIZE, MIN_SIZE } from "./constants/sizes";
-import { VisitorSprite } from "./sprites/VisitorSprite";
+import { VisitorSprite } from "./components/sprites/VisitorSprite";
 // extend tells @pixi/react what Pixi.js components are available
 extend({
   Graphics,
@@ -14,23 +14,7 @@ extend({
   Container,
 });
 
-export function App() {
-  const appRef = useRef<ApplicationRef>(null);
-
-  return (
-    <Application
-      className="w-full h-full"
-      ref={appRef}
-      width={MAX_SIZE}
-      height={MAX_SIZE}
-    >
-      <pixiContainer anchor={0.5}>
-        <BackgroundSprite />
-        <VisitorSprite />
-      </pixiContainer>
-    </Application>
-  );
-}
+// 각 round 단위로 퀴즈 관리
 
 export default function AppContainer() {
   const appContainerRef = useRef<HTMLDivElement>(null);
@@ -69,14 +53,43 @@ export default function AppContainer() {
   return (
     <div className="relative" ref={appContainerRef}>
       <App />
-      <footer className="absolute w-full bottom-0 flex justify-center">
-        <div className="border-white border-4 h-3/12 text-white p-4 w-2/3 backdrop-blur-md overflow-auto">
+      {/* 말풍선 */}
+      {/* <div className="absolute bottom-[45%] left-1/2">
+        <div className="relative inline-block bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md">
+          const foo:Foo = "1"
+          <div className="absolute left-4 bottom-[-8px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white"></div>
+        </div>
+      </div> */}
+      <footer className="absolute bottom-0 grid grid-cols-5 gap-4 w-full h-1/6">
+        <button className="col-span-1 bg-green-600 border-2 rounded-2xl">
+          Pass
+        </button>
+        <div className="col-span-3 border-white border-4 text-white p-2 flex-grow backdrop-blur-md overflow-scroll">
           <h1>Our Type</h1>
           <p>type Foo = string</p>
-          <button>Enter</button>
-          <button>Guard</button>
         </div>
+        <button className="col-span-1 bg-red-500 border-2 rounded-2xl">
+          Guard
+        </button>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  const appRef = useRef<ApplicationRef>(null);
+
+  return (
+    <Application
+      className="w-full h-full"
+      ref={appRef}
+      width={MAX_SIZE}
+      height={MAX_SIZE}
+    >
+      <pixiContainer anchor={0.5}>
+        <BackgroundSprite />
+        <VisitorSprite />
+      </pixiContainer>
+    </Application>
   );
 }

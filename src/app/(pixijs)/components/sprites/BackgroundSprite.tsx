@@ -1,12 +1,15 @@
 "use client";
 import { AnimatedSprite, AnimatedSpriteFrames, Assets, Texture } from "pixi.js";
 import { useEffect, useRef, useState } from "react";
-import { MAX_SIZE } from "../constants/sizes";
+import { MAX_SIZE } from "../../constants/sizes";
 export function BackgroundSprite() {
   const spriteRef = useRef<AnimatedSprite>(null);
   const [textures, setTextures] = useState<AnimatedSpriteFrames>([
     Texture.EMPTY,
   ]);
+
+  // idle
+  // guard -> guard_idle -> guard -> idle (역순)
 
   // Preload the sprite if it hasn't been loaded yet
   useEffect(() => {
@@ -36,6 +39,13 @@ export function BackgroundSprite() {
         result.idle3,
         result.idle4,
         result.idle5,
+        // result.guard1,
+        // result.guard2,
+        // result.guard3,
+        // result.guard4,
+        // result.guard5,
+        // result.guard6,
+        // result.guard7,
       ]);
     });
   }, []);
