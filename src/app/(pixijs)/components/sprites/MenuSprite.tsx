@@ -1,18 +1,14 @@
 import { Assets, Texture } from "pixi.js";
 import { useEffect, useRef, useState } from "react";
-import { MAX_SIZE } from "../constants/sizes";
-// import { useTick } from "@pixi/react";
+import { MAX_SIZE } from "../../constants/sizes";
 
-export function VisitorSprite() {
-  // The Pixi.js `Sprite`
+export function MenuSprite() {
   const spriteRef = useRef(null);
-
   const [texture, setTexture] = useState(Texture.EMPTY);
 
-  // Preload the sprite if it hasn't been loaded yet
   useEffect(() => {
     if (texture === Texture.EMPTY) {
-      Assets.load("assets/visitors/visitor1.png").then((result) => {
+      Assets.load(`assets/ui/paper.png`).then((result) => {
         setTexture(result);
       });
     }
@@ -24,9 +20,9 @@ export function VisitorSprite() {
       anchor={0.5}
       texture={texture}
       x={MAX_SIZE / 2}
-      y={MAX_SIZE / 1.3}
-      width={MAX_SIZE / 2}
-      height={MAX_SIZE / 2}
-    />
+      y={MAX_SIZE / 2}
+      width={MAX_SIZE / 1.5}
+      height={MAX_SIZE / 1.5}
+    ></pixiSprite>
   );
 }
