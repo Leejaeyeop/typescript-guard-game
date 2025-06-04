@@ -130,33 +130,15 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
         setQuizes([
           {
             id: 1,
-            question: "this is first question",
-            answer: "const foo:Foo = 1",
-            correctAnswer: true,
+            question: `type Foo = string\nconst foo:Foo = 123`,
           },
           {
             id: 2,
-            question: "this is second question",
-            answer: "const foo:Foo = 1",
-            correctAnswer: true,
+            question: `const a: number = 123;`,
           },
           {
             id: 3,
-            question: "this is third question",
-            answer: "const foo:Foo = 1",
-            correctAnswer: true,
-          },
-          {
-            id: 4,
-            question: "this is fourth question",
-            answer: "const foo:Foo = 1",
-            correctAnswer: true,
-          },
-          {
-            id: 5,
-            question: "this is fifth question",
-            answer: "const foo:Foo = 1",
-            correctAnswer: true,
+            question: `const a: string | number = 123;`,
           },
         ]);
         setIsVisibleOption(true);
