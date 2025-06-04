@@ -20,6 +20,8 @@ import { useMenuStore } from "@/store/useMenuStore";
 import { PauseMenu } from "@/components/overlay/menu/PauseMenu";
 import { MainMenu } from "@/components/overlay/menu/MainMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
+import MonacoEditorWithTypeCheck from "@/components/overlay/MonacoEditorWithTypeCheck";
+import MonacoEditorWithSilentErrors from "@/components/overlay/MonacoEditorWithTypeCheck";
 
 extend({
   Graphics,
@@ -87,10 +89,11 @@ function HTMLOverlay() {
         )}
         {/* answer */}
         {isVisibleAnswer && (
-          <div className="absolute bottom-[45%] left-1/2">
-            <div className="relative inline-block bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md">
-              {curRoundQuiz?.answer}
-              <div className="absolute left-4 bottom-[-8px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white"></div>
+          <div className="absolute bottom-[45%] h-1/7 w-1/2 left-1/4">
+            <div className="relative inline-block bg-white h-full w-full text-gray-800 px-4 py-2 rounded-lg shadow-md">
+              {/* {curRoundQuiz?.answer} */}
+              <MonacoEditorWithSilentErrors />
+              <div className="absolute left-1/2 bottom-[-8px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white"></div>
             </div>
           </div>
         )}
@@ -107,7 +110,7 @@ function HTMLOverlay() {
             {/* <div className="col-span-3 border-white border-4 text-white p-2 flex-grow backdrop-blur-md overflow-auto"> */}
             <div className="col-span-3 border-white border-4 text-white p-2 flex-grow bg-black overflow-auto">
               <h1>Our Type</h1>
-              <p> {curRoundQuiz?.question}</p>
+              <MonacoEditorWithSilentErrors />
             </div>
             <button
               className="col-span-1 bg-red-500 disabled:bg-red-300 border-2 rounded-2xl"
