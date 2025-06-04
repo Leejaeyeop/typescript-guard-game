@@ -8,7 +8,12 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Quiz } from "../types/quiz";
+import { Quiz } from "@/types/quiz";
+import { DifficultyLevel } from "@/types/difficultyLevel";
+import { useMenuStore } from "@/store/useMenuStore";
+import { ResultMenu } from "@/components/overlay/menu/ResultMenu";
+import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
+
 type StageContextType = {
   // score
   score: number;
@@ -19,9 +24,13 @@ type StageContextType = {
   quizes: Quiz[];
   curStagePhase: (typeof stagePhase)[number];
   setStagePhaseIdx: Dispatch<SetStateAction<number>>;
-  setStageDifficultyLevel: Dispatch<SetStateAction<string | null>>;
+  setStageDifficultyLevel: Dispatch<SetStateAction<DifficultyLevel | null>>;
   curRoundQuiz: Quiz;
   reportRoundOutcome: (result: { isCorrect: boolean }) => void;
+  isVisibleOption: boolean;
+  initStage: () => void;
+  isPaused: boolean;
+  setIsPaused: Dispatch<SetStateAction<boolean>>;
 };
 
 const stagePhase = [
@@ -39,6 +48,8 @@ const initialStageState = {
   score: 0,
   curRoundIdx: 0,
   quizes: [],
+  isVisibleOption: false,
+  isPaused: false,
 };
 
 const StageContext = createContext<StageContextType | undefined>(undefined);
@@ -48,19 +59,32 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   const [stagePhaseIdx, setStagePhaseIdx] = useState(
     initialStageState.stagePhaseIdx
   );
+  const { activeScene } = useAppStore();
+
   // 스테이지 난이도
-  const [stageDifficultyLevel, setStageDifficultyLevel] = useState<
-    string | null
-  >(initialStageState.stageDifficultyLevel);
+  const [stageDifficultyLevel, setStageDifficultyLevel] =
+    useState<DifficultyLevel | null>(initialStageState.stageDifficultyLevel);
   const [score, setScore] = useState(initialStageState.score);
+  const [isVisibleOption, setIsVisibleOption] = useState(
+    initialStageState.isVisibleOption
+  );
   const [curRoundIdx, setCurRoundIdx] = useState(initialStageState.curRoundIdx);
+  const [isPaused, setIsPaused] = useState(initialStageState.isPaused);
   const [quizes, setQuizes] = useState<Quiz[]>([]);
+
+  const { openMenu, setMenuOverlay } = useMenuStore();
 
   // reset 로직
   const resetStates = () => {
     setScore(initialStageState.score);
+    setIsVisibleOption(initialStageState.isVisibleOption);
     setCurRoundIdx(initialStageState.curRoundIdx);
     setQuizes(initialStageState.quizes);
+    setIsPaused(false);
+  };
+
+  const initStage = () => {
+    setStagePhaseIdx(1);
   };
 
   const curStagePhase = useMemo(() => {
@@ -72,6 +96,10 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   }, [quizes, curRoundIdx]);
 
   const reportRoundOutcome = ({ isCorrect }: { isCorrect: boolean }) => {
+    // 점수 획득
+    if (isCorrect) {
+      setScore(score + 1);
+    }
     if (curRoundIdx === quizes.length - 1) {
       // 퀴즈가 전부 종료됨
       setStagePhaseIdx(stagePhaseIdx + 1);
@@ -81,6 +109,14 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // main menu scene 설정 직후
+  useEffect(() => {
+    if (activeScene === SCENE_IDS.MAIN) {
+      // none
+      setStagePhaseIdx(0);
+    }
+  }, [activeScene]);
+
   useEffect(() => {
     // 메인 메뉴
     if (curStagePhase === "NONE") {
@@ -89,7 +125,6 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
     } else if (curStagePhase === "PREPARE") {
       // 재시작 / 다음 스테이지 바로 사작 등을 상정
       resetStates();
-      console.log(stageDifficultyLevel);
       // test api 호출
       fetch(`https://jsonplaceholder.typicode.com/posts/30`).then(() => {
         setQuizes([
@@ -124,6 +159,8 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
             correctAnswer: true,
           },
         ]);
+        setIsVisibleOption(true);
+
         // 다음 페이즈 시작
         setStagePhaseIdx(2);
       });
@@ -133,7 +170,8 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
       setStagePhaseIdx(3);
     } else if (curStagePhase === "ROUNDS_IN_PROGRESS") {
     } else if (curStagePhase === "STAGE_RESULTS") {
-      console.log("스테이지 종료!!");
+      setMenuOverlay(<ResultMenu />);
+      openMenu();
     }
   }, [curStagePhase]);
 
@@ -149,6 +187,10 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
         setStageDifficultyLevel,
         curRoundQuiz,
         reportRoundOutcome,
+        isVisibleOption,
+        initStage,
+        isPaused,
+        setIsPaused,
       }}
     >
       {children}
