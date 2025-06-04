@@ -22,8 +22,10 @@ type RoundContextType = {
   backgroundRef: RefObject<BackgroundSpriteHandle | null>;
   setRoundPhaseIdx: Dispatch<SetStateAction<number>>;
   visitorRef: Ref<VisitorSpriteHandle | null>;
-  showVisitor: boolean;
-  setShowVisitor: Dispatch<SetStateAction<boolean>>;
+  isVisibleVisitor: boolean;
+  isVisibleAnswer: boolean;
+  isVisibleActionBar: boolean;
+  setIsVisibleVisitor: Dispatch<SetStateAction<boolean>>;
   submitAnswer: (answer: boolean) => void;
   updatePendingAnimationsCount: (action: "increment" | "decrement") => void;
 };
@@ -42,7 +44,9 @@ const roundPhase = [
 const initialRoundState = {
   roundPhaseIdx: 0,
   userAnswer: null as boolean | null,
-  showVisitor: false,
+  isVisibleAnswer: false,
+  isVisibleActionBar: false,
+  isVisibleVisitor: false,
   pendingAnimationsCount: 0,
 };
 
@@ -54,10 +58,18 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
     initialRoundState.roundPhaseIdx
   );
 
+  const [isVisibleAnswer, setIsVisibleAnswer] = useState(
+    initialRoundState.isVisibleAnswer
+  );
+  const [isVisibleActionBar, setIsVisibleActionBar] = useState(
+    initialRoundState.isVisibleActionBar
+  );
   // 사용자 응답 값
   const [userAnswer, setUserAnswer] = useState(initialRoundState.userAnswer);
   // visitor
-  const [showVisitor, setShowVisitor] = useState(initialRoundState.showVisitor);
+  const [isVisibleVisitor, setIsVisibleVisitor] = useState(
+    initialRoundState.isVisibleVisitor
+  );
   // 에니메이션 대기 카운트
   const [, setPendingAnimationsCount] = useState(
     initialRoundState.pendingAnimationsCount
@@ -69,7 +81,6 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   const updatePendingAnimationsCount = (
     action: "increment" | "decrement" | "reset"
   ) => {
-    // console.log("start", action);
     setPendingAnimationsCount((prev) => {
       const next = action === "increment" ? prev + 1 : Math.max(prev - 1, 0);
 
@@ -86,7 +97,9 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   // reset 로직
   const resetStates = () => {
     setUserAnswer(initialRoundState.userAnswer);
-    setShowVisitor(initialRoundState.showVisitor);
+    setIsVisibleAnswer(initialRoundState.isVisibleAnswer);
+    setIsVisibleActionBar(initialRoundState.isVisibleActionBar);
+    setIsVisibleVisitor(initialRoundState.isVisibleVisitor);
     setPendingAnimationsCount(initialRoundState.pendingAnimationsCount);
   };
 
@@ -126,14 +139,19 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
     } else if (curRoundPhase === "ROUND_START") {
       backgroundRef.current!.playIdleAnimation();
       // visitor 등장 -> visitor appear가 종료되어야 다음 페이즈로 넘어간다.
-      startAnimation(() => setShowVisitor(true));
+      startAnimation(() => setIsVisibleVisitor(true));
       // footer empty?
     } else if (curRoundPhase === "PRESENTING_QUESTION") {
       // 문제를 출제한다.
       // visitor 말풍선 text
+      setIsVisibleAnswer(true);
       // footer text
+      setIsVisibleActionBar(true);
     } else if (curRoundPhase === "ANSWER_SUBMITTED") {
       startAnimation(() => visitorRef.current?.setStatus("disappear"));
+      setIsVisibleAnswer(false);
+      setIsVisibleActionBar(false);
+
       if (!userAnswer) {
         // 유저 answer이 guard 일 경우
         startAnimation(() => backgroundRef?.current?.playGuardAnimation());
@@ -141,7 +159,7 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
     } else if (curRoundPhase === "ROUND_ENDED") {
       reportRoundOutcome({ isCorrect: isCorrect(userAnswer!) });
     }
-  }, [curRoundPhase, userAnswer]);
+  }, [curRoundPhase]);
 
   return (
     <RoundContext.Provider
@@ -150,8 +168,10 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
         curRoundPhase,
         backgroundRef,
         visitorRef,
-        showVisitor,
-        setShowVisitor,
+        isVisibleVisitor,
+        isVisibleAnswer,
+        isVisibleActionBar,
+        setIsVisibleVisitor,
         updatePendingAnimationsCount,
         submitAnswer,
       }}

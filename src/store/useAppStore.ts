@@ -1,21 +1,21 @@
 import { create } from "zustand";
 
-// 스토어의 상태와 액션에 대한 타입 정의
+export const SCENE_IDS = {
+  MAIN: "Main",
+  QUIZ_STAGE: "QuizStage",
+} as const;
+
+export type SceneId = (typeof SCENE_IDS)[keyof typeof SCENE_IDS];
+
 interface AppState {
   isSoundOn: boolean;
-  toggleSound: () => void;
-  isMenuOpen: boolean;
-  setIsMenuOpen: (state: boolean) => void;
-  // 다른 전역 상태 및 액션 추가 가능
-  // 예: userPreferences: object;
-  // 예: setUserPreference: (key: string, value: any) => void;
+  // scene 상태
+  activeScene: SceneId; // 정의한 SceneId 타입을 사용
+  setActiveScene: (scene: SceneId) => void;
 }
 
-// 스토어 생성
 export const useAppStore = create<AppState>((set) => ({
   isSoundOn: true, // 초기 사운드 상태
-  setIsMenuOpen: (value) => set({ isMenuOpen: value }),
-  isMenuOpen: true,
-  toggleSound: () => set((state) => ({ isSoundOn: !state.isSoundOn })),
-  // 다른 상태 초기값 및 액션 구현
+  activeScene: SCENE_IDS.MAIN, // 초기 활성 장면
+  setActiveScene: (scene) => set({ activeScene: scene }),
 }));

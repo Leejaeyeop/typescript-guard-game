@@ -18,7 +18,8 @@ export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
   const spriteRef = useRef(null);
   const [texture, setTexture] = useState(Texture.EMPTY);
   const [positionY, setPositionY] = useState(MAX_SIZE);
-  const { updatePendingAnimationsCount, setShowVisitor } = useRoundManager();
+  const { updatePendingAnimationsCount, setIsVisibleVisitor } =
+    useRoundManager();
   const status = useRef<"appear" | "disappear" | "idle">("appear");
 
   // Preload the sprite if it hasn't been loaded yet
@@ -45,7 +46,7 @@ export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
         setPositionY((prev) => prev + 4);
       } else {
         status.current = "idle";
-        setShowVisitor(false);
+        setIsVisibleVisitor(false);
         updatePendingAnimationsCount("decrement");
       }
     }
