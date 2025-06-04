@@ -1,17 +1,25 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Editor, { OnMount } from "@monaco-editor/react";
+import { useRoundManager } from "@/app/(pixijs)/hooks/use-round-manager";
+
 import * as monacoEditor from "monaco-editor";
 
-export default function MonacoEditorWithSilentErrors() {
+interface MonacoEditorProps {
+  value: string | null;
+}
+
+export default function MonacoEditor({ value }: MonacoEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(
     null
   );
-  const [hasError, setHasError] = useState(false);
+  const { setCorrectAnswer } = useRoundManager();
 
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
+
+    editorRef.current?.setValue(value ?? "");
 
     // 에러는 코드상 체크하되, 마커 UI는 지움
     monaco.editor.onDidChangeMarkers(() => {
@@ -27,10 +35,14 @@ export default function MonacoEditorWithSilentErrors() {
       const hasSyntaxOrTypeError = markers.some(
         (marker) => marker.severity === monaco.MarkerSeverity.Error
       );
-      console.log(hasSyntaxOrTypeError);
-      setHasError(hasSyntaxOrTypeError);
+      setCorrectAnswer(!hasSyntaxOrTypeError);
     });
   };
+
+  useEffect(() => {
+    if (!value) return;
+    editorRef.current?.setValue(value);
+  }, [value]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -51,7 +63,6 @@ export default function MonacoEditorWithSilentErrors() {
         height="100%"
         width="100%"
         defaultLanguage="typescript"
-        defaultValue={`const a: string = 123;`}
         onMount={handleEditorMount}
         theme="vs-dark"
         options={{
@@ -60,11 +71,17 @@ export default function MonacoEditorWithSilentErrors() {
           lineNumbers: "off",
           minimap: { enabled: false },
           contextmenu: false, // 우클릭 메뉴 비활성화
+          // width 값을 고정시킨다.
+          wordWrap: "on",
+          cursorStyle: "line",
+          mouseStyle: "default", // 커서 모양 단순화
+          selectionHighlight: false,
+          selectionClipboard: false,
+          dragAndDrop: false, // ⛔ 드래그 금지
+
+          autoIndent: "full",
         }}
       />
-      {/* <div style={{ marginTop: "1rem", fontWeight: "bold" }}>
-        코드 상태: {hasError ? "❌ 에러 있음" : "✅ 유효한 코드"}
-      </div> */}
     </div>
   );
 }

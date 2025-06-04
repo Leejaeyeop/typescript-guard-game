@@ -27,6 +27,7 @@ type RoundContextType = {
   isVisibleActionBar: boolean;
   setIsVisibleVisitor: Dispatch<SetStateAction<boolean>>;
   submitAnswer: (answer: boolean) => void;
+  setCorrectAnswer: (answer: boolean) => void;
   updatePendingAnimationsCount: (action: "increment" | "decrement") => void;
 };
 
@@ -44,6 +45,7 @@ const roundPhase = [
 const initialRoundState = {
   roundPhaseIdx: 0,
   userAnswer: null as boolean | null,
+  correctAnswer: null as boolean | null,
   isVisibleAnswer: false,
   isVisibleActionBar: false,
   isVisibleVisitor: false,
@@ -51,8 +53,7 @@ const initialRoundState = {
 };
 
 export const RoundProvider = ({ children }: { children: ReactNode }) => {
-  const { curStagePhase, curRoundQuiz, reportRoundOutcome, curRoundIdx } =
-    useStageManager();
+  const { curStagePhase, reportRoundOutcome, curRoundIdx } = useStageManager();
   // 현재 round 페이즈
   const [roundPhaseIdx, setRoundPhaseIdx] = useState(
     initialRoundState.roundPhaseIdx
@@ -66,6 +67,10 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   );
   // 사용자 응답 값
   const [userAnswer, setUserAnswer] = useState(initialRoundState.userAnswer);
+  // 정답 값
+  const [correctAnswer, setCorrectAnswer] = useState(
+    initialRoundState.correctAnswer
+  );
   // visitor
   const [isVisibleVisitor, setIsVisibleVisitor] = useState(
     initialRoundState.isVisibleVisitor
@@ -97,6 +102,7 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   // reset 로직
   const resetStates = () => {
     setUserAnswer(initialRoundState.userAnswer);
+    setCorrectAnswer(initialRoundState.correctAnswer);
     setIsVisibleAnswer(initialRoundState.isVisibleAnswer);
     setIsVisibleActionBar(initialRoundState.isVisibleActionBar);
     setIsVisibleVisitor(initialRoundState.isVisibleVisitor);
@@ -131,7 +137,7 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const isCorrect = (userAnswer: boolean) => {
-      return curRoundQuiz.correctAnswer === userAnswer;
+      return correctAnswer === userAnswer;
     };
 
     if (curRoundPhase === "NONE") {
@@ -174,6 +180,7 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
         setIsVisibleVisitor,
         updatePendingAnimationsCount,
         submitAnswer,
+        setCorrectAnswer,
       }}
     >
       {children}

@@ -20,8 +20,8 @@ import { useMenuStore } from "@/store/useMenuStore";
 import { PauseMenu } from "@/components/overlay/menu/PauseMenu";
 import { MainMenu } from "@/components/overlay/menu/MainMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
-import MonacoEditorWithTypeCheck from "@/components/overlay/MonacoEditorWithTypeCheck";
-import MonacoEditorWithSilentErrors from "@/components/overlay/MonacoEditorWithTypeCheck";
+import MonacoEditor from "@/components/overlay/MonacoEditor";
+import Image from "next/image";
 
 extend({
   Graphics,
@@ -88,36 +88,43 @@ function HTMLOverlay() {
           </div>
         )}
         {/* answer */}
-        {isVisibleAnswer && (
-          <div className="absolute bottom-[45%] h-1/7 w-1/2 left-1/4">
-            <div className="relative inline-block bg-white h-full w-full text-gray-800 px-4 py-2 rounded-lg shadow-md">
-              {/* {curRoundQuiz?.answer} */}
-              <MonacoEditorWithSilentErrors />
-              <div className="absolute left-1/2 bottom-[-8px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white"></div>
-            </div>
+        <div
+          className={`absolute bottom-[45%] h-1/5 w-1/2 left-1/4 ${
+            !isVisibleAnswer && "hidden"
+          }`}
+        >
+          <div className="relative inline-block bg-white h-full w-full px-2 py-2 rounded-xl shadow-md">
+            {/* {curRoundQuiz?.answer} */}
+            <MonacoEditor value={curRoundQuiz?.question} />
+            <div className="absolute left-1/2 bottom-[-8px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white"></div>
           </div>
-        )}
+        </div>
         {/* action bar */}
         {isVisibleActionBar && (
-          <footer className="absolute bottom-0 grid grid-cols-5 gap-4 w-full h-1/6">
+          <footer className="absolute bottom-0 gap-[5%] w-full h-1/6 flex justify-center">
             <button
-              className="col-span-1 bg-green-600 border-2 rounded-2xl disabled:bg-green-300"
+              className="w-1/5 hover:cursor-pointer disabled:opacity-50"
               disabled={curRoundPhase !== "PRESENTING_QUESTION"}
               onClick={() => submitAnswer(true)}
             >
-              Pass
+              <Image
+                src="/assets/ui/pass_button.png"
+                alt="pass_button"
+                width={500}
+                height={100}
+              />
             </button>
-            {/* <div className="col-span-3 border-white border-4 text-white p-2 flex-grow backdrop-blur-md overflow-auto"> */}
-            <div className="col-span-3 border-white border-4 text-white p-2 flex-grow bg-black overflow-auto">
-              <h1>Our Type</h1>
-              <MonacoEditorWithSilentErrors />
-            </div>
             <button
-              className="col-span-1 bg-red-500 disabled:bg-red-300 border-2 rounded-2xl"
+              className="w-1/5 hover:cursor-pointer disabled:opacity-50"
               disabled={curRoundPhase !== "PRESENTING_QUESTION"}
               onClick={() => submitAnswer(false)}
             >
-              Guard
+              <Image
+                src="/assets/ui/guard_button.png"
+                alt="pass_button"
+                width={500}
+                height={100}
+              />
             </button>
           </footer>
         )}

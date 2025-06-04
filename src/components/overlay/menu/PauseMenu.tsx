@@ -21,7 +21,14 @@ function PauseMenuContent() {
   return (
     <>
       <MenuButton onClick={() => closeMenu()}>Continue</MenuButton>
-      <MenuButton onClick={() => initStage()}>Restart Game</MenuButton>
+      <MenuButton
+        onClick={() => {
+          initStage();
+          closeMenu();
+        }}
+      >
+        Restart Game
+      </MenuButton>
       <MenuButton
         onClick={() => {
           setActiveScene(SCENE_IDS.MAIN);
