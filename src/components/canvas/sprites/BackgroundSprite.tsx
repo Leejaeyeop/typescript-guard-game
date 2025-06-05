@@ -1,4 +1,6 @@
 "use client";
+import { MAX_SIZE } from "@/app/(pixijs)/constants/sizes";
+import { useRoundManager } from "@/app/(pixijs)/hooks/use-round-manager";
 import {
   AnimatedSprite,
   AnimatedSpriteFrames,
@@ -7,8 +9,6 @@ import {
   Texture,
 } from "pixi.js";
 import { useEffect, useRef, useState, useImperativeHandle, Ref } from "react";
-import { MAX_SIZE } from "../../constants/sizes";
-import { useRoundManager } from "../../hooks/use-round-manager";
 
 const spritesPath = {
   idle1: "assets/background/idle/idle1.jpeg",

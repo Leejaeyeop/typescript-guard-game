@@ -13,9 +13,9 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-import { BackgroundSpriteHandle } from "../components/sprites/BackgroundSprite";
-import { VisitorSpriteHandle } from "../components/sprites/VisitorSprite";
 import { useStageManager } from "./use-stage-manager";
+import { BackgroundSpriteHandle } from "@/components/canvas/sprites/BackgroundSprite";
+import { VisitorSpriteHandle } from "@/components/canvas/sprites/VisitorSprite";
 
 const ROUND_RESULT = {
   NONE: "NONE",
