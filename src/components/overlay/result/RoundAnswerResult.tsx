@@ -13,30 +13,20 @@ export function RoundAnswerResult() {
 
   return (
     <div
-      className="absolute w-full h-full z-[5] top-0"
+      className="absolute w-full h-full z-[5] top-0 flex justify-center items-center"
       onAnimationEnd={() => {
         updatePendingAnimationsCount("decrement");
         setIsVisibleRoundResult(false);
       }}
     >
       <div
-        className={`${bgMap[roundResult]} animate-fade-in-out w-full h-full opacity-0`}
+        className={`${bgMap[roundResult]} animate-fade-in-out w-full h-full opacity-0 absolute`}
       ></div>
-      <div className="absolute top-1/3 left-1/4">
+      <div className="w-1/2 h-1/6 relative">
         {roundResult === "RIGHT" ? (
-          <Image
-            src="/assets/ui/right_text.webp"
-            alt="pass_button"
-            width={450}
-            height={100}
-          />
+          <Image src="/assets/ui/right_text.webp" alt="result_text" fill />
         ) : (
-          <Image
-            src="/assets/ui/wrong_text.webp"
-            alt="pass_button"
-            width={450}
-            height={100}
-          />
+          <Image src="/assets/ui/wrong_text.webp" alt="wrong_text" fill />
         )}
       </div>
     </div>
