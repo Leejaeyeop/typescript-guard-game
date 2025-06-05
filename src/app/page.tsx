@@ -1,6 +1,18 @@
 import App from "./(pixijs)/App";
 import { MAX_SIZE } from "./(pixijs)/constants/sizes";
-export default function Home() {
+import { api } from "../../convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
+import { Quiz } from "@/types/quiz";
+
+export default async function Home() {
+  let quizzes: Quiz[] = [];
+
+  try {
+    quizzes = await fetchQuery(api.quizzes.get);
+  } catch (error) {
+    console.error("Failed to fetch quiz data:", error);
+  }
+
   return (
     <main className="w-screen h-screen flex items-center justify-center flex-col bg-black">
       <div
@@ -10,8 +22,10 @@ export default function Home() {
           maxHeight: MAX_SIZE + "px",
         }}
       >
-        <App />
+        <App totalQuizzes={quizzes} />
       </div>
     </main>
   );
 }
+
+export const revalidate = 3600;

@@ -15,6 +15,7 @@ export function ActionBar() {
           alt="pass_button"
           width={500}
           height={100}
+          loading="eager"
         />
       </button>
       <button
@@ -27,6 +28,7 @@ export function ActionBar() {
           alt="pass_button"
           width={500}
           height={100}
+          loading="eager"
         />
       </button>
     </footer>

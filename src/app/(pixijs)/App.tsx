@@ -18,6 +18,7 @@ import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import HTMLOverlay from "@/components/overlay/HTMLOverlay";
 import { BackgroundSprite } from "@/components/canvas/sprites/BackgroundSprite";
 import { VisitorSprite } from "@/components/canvas/sprites/VisitorSprite";
+import { Quiz } from "@/types/quiz";
 
 extend({
   Graphics,
@@ -26,11 +27,14 @@ extend({
   Container,
 });
 
-export default function AppContainer() {
+interface AppContainerInterface {
+  totalQuizzes: Quiz[];
+}
+
+export default function AppContainer({ totalQuizzes }: AppContainerInterface) {
   const appContainerRef = useRef<HTMLDivElement>(null);
   const { setMenuOverlay, openMenu } = useMenuStore();
   const { activeScene } = useAppStore();
-
   useResize(appContainerRef);
 
   // main menu scene 설정 직후
@@ -43,7 +47,7 @@ export default function AppContainer() {
 
   return (
     <div className="relative" ref={appContainerRef}>
-      <StageProvider>
+      <StageProvider totalQuizzes={totalQuizzes}>
         <RoundProvider>
           <App />
           <HTMLOverlay />

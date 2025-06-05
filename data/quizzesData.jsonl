@@ -1,0 +1,4 @@
+{ "id": 1, "difficultyLevel":"BEGINNER", "question": "type Foo = string\nconst foo:Foo = 123" }
+{ "id": 2, "difficultyLevel":"BEGINNER", "question": "const a: number = 123;" }
+{ "id": 3, "difficultyLevel":"BEGINNER", "question": "const a: string | number = 123;" }
+{ "id": 4, "difficultyLevel":"BEGINNER", "question": "const a: string & number = 123;" }
