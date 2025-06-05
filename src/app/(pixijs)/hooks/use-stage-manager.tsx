@@ -21,7 +21,7 @@ type StageContextType = {
   curRoundIdx: number;
   setCurRoundIdx: Dispatch<SetStateAction<number>>;
   // 퀴즈들
-  quizes: Quiz[];
+  quizzes: Quiz[];
   curStagePhase: (typeof stagePhase)[number];
   setStagePhaseIdx: Dispatch<SetStateAction<number>>;
   setStageDifficultyLevel: Dispatch<SetStateAction<DifficultyLevel | null>>;
@@ -48,7 +48,7 @@ const initialStageState = {
   stageDifficultyLevel: null,
   correctCount: 0,
   curRoundIdx: 0,
-  quizes: [],
+  quizzes: [],
   isVisibleTopHUD: false,
   isPaused: false,
   lifePoints: 5,
@@ -58,7 +58,15 @@ const StageContext = createContext<StageContextType | undefined>(undefined);
 // 전체 문제 갯수
 export const TOTAL_NUMBER_OF_QUESTIONS = 20;
 
-export const StageProvider = ({ children }: { children: ReactNode }) => {
+interface StageProviderProps {
+  children: ReactNode;
+  totalQuizzes: Quiz[];
+}
+
+export const StageProvider = ({
+  children,
+  totalQuizzes,
+}: StageProviderProps) => {
   // 스테이지 페이즈
   const [stagePhaseIdx, setStagePhaseIdx] = useState(
     initialStageState.stagePhaseIdx
@@ -76,7 +84,7 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   );
   const [curRoundIdx, setCurRoundIdx] = useState(initialStageState.curRoundIdx);
   const [isPaused, setIsPaused] = useState(initialStageState.isPaused);
-  const [quizes, setQuizes] = useState<Quiz[]>([]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [lifePoints, setLifePoints] = useState(initialStageState.lifePoints);
 
   const { openMenu, setMenuOverlay } = useMenuStore();
@@ -86,7 +94,7 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
     setCorrectCount(initialStageState.correctCount);
     setIsVisibleTopHUD(initialStageState.isVisibleTopHUD);
     setCurRoundIdx(initialStageState.curRoundIdx);
-    setQuizes(initialStageState.quizes);
+    setQuizzes(initialStageState.quizzes);
     setIsPaused(initialStageState.isPaused);
     setLifePoints(initialStageState.lifePoints);
   };
@@ -100,8 +108,8 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   }, [stagePhaseIdx]);
 
   const curRoundQuiz = useMemo<Quiz>(() => {
-    return quizes[curRoundIdx];
-  }, [quizes, curRoundIdx]);
+    return quizzes[curRoundIdx];
+  }, [quizzes, curRoundIdx]);
 
   const reportRoundOutcome = ({ isCorrect }: { isCorrect: boolean }) => {
     // 점수 획득
@@ -117,7 +125,7 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    if (curRoundIdx === quizes.length - 1) {
+    if (curRoundIdx === quizzes.length - 1) {
       // 퀴즈가 전부 종료됨
       setStagePhaseIdx(stagePhaseIdx + 1);
     } else {
@@ -145,27 +153,16 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
       case "PREPARE": {
         // 재시작 / 다음 스테이지 바로 시작 등을 상정
         resetStates();
-        // test api 호출
-        fetch(`https://jsonplaceholder.typicode.com/posts/30`).then(() => {
-          setQuizes([
-            {
-              id: 1,
-              question: `type Foo = string\nconst foo:Foo = 123`,
-            },
-            {
-              id: 2,
-              question: `const a: number = 123;`,
-            },
-            {
-              id: 3,
-              question: `const a: string | number = 123;`,
-            },
-          ]);
-          setIsVisibleTopHUD(true);
+        if (totalQuizzes.length === 0) {
+          window.alert("Quiz data does not exist.");
+        }
 
-          // 다음 페이즈 시작
-          setStagePhaseIdx(2);
-        });
+        // test api 호출
+        setQuizzes(totalQuizzes);
+        setIsVisibleTopHUD(true);
+
+        // 다음 페이즈 시작
+        setStagePhaseIdx(2);
         break;
       }
 
@@ -208,7 +205,7 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   return (
     <StageContext.Provider
       value={{
-        quizes,
+        quizzes,
         curRoundIdx,
         setCurRoundIdx,
         curStagePhase,

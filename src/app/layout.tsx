@@ -20,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${medievalSharp.className}  antialiased `}>
+      <body
+        className={`${medievalSharp.className} antialiased bg-black text-white`}
+      >
         {children}
       </body>
     </html>

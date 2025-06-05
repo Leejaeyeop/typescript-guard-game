@@ -24,9 +24,19 @@ export function RoundAnswerResult() {
       ></div>
       <div className="w-1/2 h-1/6 relative">
         {roundResult === "RIGHT" ? (
-          <Image src="/assets/ui/right_text.webp" alt="result_text" fill />
+          <Image
+            src="/assets/ui/right_text.webp"
+            alt="result_text"
+            fill
+            loading="eager"
+          />
         ) : (
-          <Image src="/assets/ui/wrong_text.webp" alt="wrong_text" fill />
+          <Image
+            src="/assets/ui/wrong_text.webp"
+            alt="wrong_text"
+            fill
+            loading="eager"
+          />
         )}
       </div>
     </div>
