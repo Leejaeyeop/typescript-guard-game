@@ -15,8 +15,8 @@ import { ResultMenu } from "@/components/overlay/menu/ResultMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 
 type StageContextType = {
-  // score
-  score: number;
+  // correctCount
+  correctCount: number;
   // 현재 라운드 idx
   curRoundIdx: number;
   setCurRoundIdx: Dispatch<SetStateAction<number>>;
@@ -27,10 +27,11 @@ type StageContextType = {
   setStageDifficultyLevel: Dispatch<SetStateAction<DifficultyLevel | null>>;
   curRoundQuiz: Quiz;
   reportRoundOutcome: (result: { isCorrect: boolean }) => void;
-  isVisibleOption: boolean;
+  isVisibleTopHUD: boolean;
   initStage: () => void;
   isPaused: boolean;
   setIsPaused: Dispatch<SetStateAction<boolean>>;
+  lifePoints: number;
 };
 
 const stagePhase = [
@@ -45,14 +46,17 @@ const stagePhase = [
 const initialStageState = {
   stagePhaseIdx: 0,
   stageDifficultyLevel: null,
-  score: 0,
+  correctCount: 0,
   curRoundIdx: 0,
   quizes: [],
-  isVisibleOption: false,
+  isVisibleTopHUD: false,
   isPaused: false,
+  lifePoints: 5,
 };
-
 const StageContext = createContext<StageContextType | undefined>(undefined);
+
+// 전체 문제 갯수
+export const TOTAL_NUMBER_OF_QUESTIONS = 20;
 
 export const StageProvider = ({ children }: { children: ReactNode }) => {
   // 스테이지 페이즈
@@ -64,23 +68,27 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   // 스테이지 난이도
   const [stageDifficultyLevel, setStageDifficultyLevel] =
     useState<DifficultyLevel | null>(initialStageState.stageDifficultyLevel);
-  const [score, setScore] = useState(initialStageState.score);
-  const [isVisibleOption, setIsVisibleOption] = useState(
-    initialStageState.isVisibleOption
+  const [correctCount, setCorrectCount] = useState(
+    initialStageState.correctCount
+  );
+  const [isVisibleTopHUD, setIsVisibleTopHUD] = useState(
+    initialStageState.isVisibleTopHUD
   );
   const [curRoundIdx, setCurRoundIdx] = useState(initialStageState.curRoundIdx);
   const [isPaused, setIsPaused] = useState(initialStageState.isPaused);
   const [quizes, setQuizes] = useState<Quiz[]>([]);
+  const [lifePoints, setLifePoints] = useState(initialStageState.lifePoints);
 
   const { openMenu, setMenuOverlay } = useMenuStore();
 
   // reset 로직
   const resetStates = () => {
-    setScore(initialStageState.score);
-    setIsVisibleOption(initialStageState.isVisibleOption);
+    setCorrectCount(initialStageState.correctCount);
+    setIsVisibleTopHUD(initialStageState.isVisibleTopHUD);
     setCurRoundIdx(initialStageState.curRoundIdx);
     setQuizes(initialStageState.quizes);
-    setIsPaused(false);
+    setIsPaused(initialStageState.isPaused);
+    setLifePoints(initialStageState.lifePoints);
   };
 
   const initStage = () => {
@@ -98,8 +106,17 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   const reportRoundOutcome = ({ isCorrect }: { isCorrect: boolean }) => {
     // 점수 획득
     if (isCorrect) {
-      setScore(score + 1);
+      setCorrectCount(correctCount + 1);
+    } else {
+      setLifePoints(lifePoints - 1);
+
+      // 라운드 종료
+      if (lifePoints === 1) {
+        setStagePhaseIdx(stagePhaseIdx + 1);
+        return;
+      }
     }
+
     if (curRoundIdx === quizes.length - 1) {
       // 퀴즈가 전부 종료됨
       setStagePhaseIdx(stagePhaseIdx + 1);
@@ -118,42 +135,73 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
   }, [activeScene]);
 
   useEffect(() => {
-    // 메인 메뉴
-    if (curStagePhase === "NONE") {
-      resetStates();
-      // api 호출
-    } else if (curStagePhase === "PREPARE") {
-      // 재시작 / 다음 스테이지 바로 사작 등을 상정
-      resetStates();
-      // test api 호출
-      fetch(`https://jsonplaceholder.typicode.com/posts/30`).then(() => {
-        setQuizes([
-          {
-            id: 1,
-            question: `type Foo = string\nconst foo:Foo = 123`,
-          },
-          {
-            id: 2,
-            question: `const a: number = 123;`,
-          },
-          {
-            id: 3,
-            question: `const a: string | number = 123;`,
-          },
-        ]);
-        setIsVisibleOption(true);
+    switch (curStagePhase) {
+      case "NONE": {
+        resetStates();
+        // api 호출
+        break;
+      }
 
-        // 다음 페이즈 시작
-        setStagePhaseIdx(2);
-      });
-    } else if (curStagePhase === "STAGE_START") {
-      // option 아이콘 생성
-      // 만약 intro 있으면 기타등...
-      setStagePhaseIdx(3);
-    } else if (curStagePhase === "ROUNDS_IN_PROGRESS") {
-    } else if (curStagePhase === "STAGE_RESULTS") {
-      setMenuOverlay(<ResultMenu />);
-      openMenu();
+      case "PREPARE": {
+        // 재시작 / 다음 스테이지 바로 시작 등을 상정
+        resetStates();
+        // test api 호출
+        fetch(`https://jsonplaceholder.typicode.com/posts/30`).then(() => {
+          setQuizes([
+            {
+              id: 1,
+              question: `type Foo = string\nconst foo:Foo = 123`,
+            },
+            {
+              id: 2,
+              question: `const a: number = 123;`,
+            },
+            {
+              id: 3,
+              question: `const a: string | number = 123;`,
+            },
+          ]);
+          setIsVisibleTopHUD(true);
+
+          // 다음 페이즈 시작
+          setStagePhaseIdx(2);
+        });
+        break;
+      }
+
+      case "STAGE_START": {
+        // option 아이콘 생성
+        // 만약 intro 있으면 기타 등등...
+        setStagePhaseIdx(3);
+        break;
+      }
+
+      case "ROUNDS_IN_PROGRESS": {
+        // 현재 로직 없음
+        break;
+      }
+
+      case "STAGE_RESULTS": {
+        setIsVisibleTopHUD(false);
+        let isFailed = false;
+        // 스테이지 실패 (라이프 포인트 0)
+        if (lifePoints === 0) {
+          isFailed = true;
+        }
+        setMenuOverlay(
+          <ResultMenu
+            isFailed={isFailed}
+            TotalNumberOfQuestions={TOTAL_NUMBER_OF_QUESTIONS}
+            correctCount={correctCount}
+          />
+        );
+
+        openMenu();
+        break;
+      }
+
+      default:
+        break;
     }
   }, [curStagePhase]);
 
@@ -164,15 +212,16 @@ export const StageProvider = ({ children }: { children: ReactNode }) => {
         curRoundIdx,
         setCurRoundIdx,
         curStagePhase,
-        score,
+        correctCount,
         setStagePhaseIdx,
         setStageDifficultyLevel,
         curRoundQuiz,
         reportRoundOutcome,
-        isVisibleOption,
+        isVisibleTopHUD,
         initStage,
         isPaused,
         setIsPaused,
+        lifePoints,
       }}
     >
       {children}
