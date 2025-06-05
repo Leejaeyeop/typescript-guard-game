@@ -17,6 +17,14 @@ import { BackgroundSpriteHandle } from "../components/sprites/BackgroundSprite";
 import { VisitorSpriteHandle } from "../components/sprites/VisitorSprite";
 import { useStageManager } from "./use-stage-manager";
 
+const ROUND_RESULT = {
+  NONE: "NONE",
+  RIGHT: "RIGHT",
+  WRONG: "WRONG",
+} as const;
+
+export type RoundResult = (typeof ROUND_RESULT)[keyof typeof ROUND_RESULT];
+
 type RoundContextType = {
   curRoundPhase: (typeof roundPhase)[number];
   backgroundRef: RefObject<BackgroundSpriteHandle | null>;
@@ -29,6 +37,9 @@ type RoundContextType = {
   submitAnswer: (answer: boolean) => void;
   setCorrectAnswer: (answer: boolean) => void;
   updatePendingAnimationsCount: (action: "increment" | "decrement") => void;
+  isVisibleRoundResult: boolean;
+  setIsVisibleRoundResult: Dispatch<SetStateAction<boolean>>;
+  roundResult: RoundResult;
 };
 
 const RoundContext = createContext<RoundContextType | undefined>(undefined);
@@ -38,7 +49,7 @@ const roundPhase = [
   "ROUND_START",
   "PRESENTING_QUESTION",
   "ANSWER_SUBMITTED",
-  // "SHOW_RESULT",
+  "SHOW_RESULT",
   "ROUND_ENDED",
 ] as const;
 
@@ -50,6 +61,8 @@ const initialRoundState = {
   isVisibleActionBar: false,
   isVisibleVisitor: false,
   pendingAnimationsCount: 0,
+  isVisibleRoundResult: false,
+  roundResult: ROUND_RESULT.NONE,
 };
 
 export const RoundProvider = ({ children }: { children: ReactNode }) => {
@@ -75,6 +88,14 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   const [isVisibleVisitor, setIsVisibleVisitor] = useState(
     initialRoundState.isVisibleVisitor
   );
+  // result - right
+  const [isVisibleRoundResult, setIsVisibleRoundResult] = useState(
+    initialRoundState.isVisibleRoundResult
+  );
+  const [roundResult, setRoundResult] = useState<RoundResult>(
+    initialRoundState.roundResult
+  );
+
   // 에니메이션 대기 카운트
   const [, setPendingAnimationsCount] = useState(
     initialRoundState.pendingAnimationsCount
@@ -107,6 +128,8 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
     setIsVisibleActionBar(initialRoundState.isVisibleActionBar);
     setIsVisibleVisitor(initialRoundState.isVisibleVisitor);
     setPendingAnimationsCount(initialRoundState.pendingAnimationsCount);
+    setIsVisibleRoundResult(initialRoundState.isVisibleRoundResult);
+    setRoundResult(initialRoundState.roundResult);
   };
 
   const curRoundPhase = useMemo(() => {
@@ -140,30 +163,54 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
       return correctAnswer === userAnswer;
     };
 
-    if (curRoundPhase === "NONE") {
-      resetStates();
-    } else if (curRoundPhase === "ROUND_START") {
-      backgroundRef.current!.playIdleAnimation();
-      // visitor 등장 -> visitor appear가 종료되어야 다음 페이즈로 넘어간다.
-      startAnimation(() => setIsVisibleVisitor(true));
-      // footer empty?
-    } else if (curRoundPhase === "PRESENTING_QUESTION") {
-      // 문제를 출제한다.
-      // visitor 말풍선 text
-      setIsVisibleAnswer(true);
-      // footer text
-      setIsVisibleActionBar(true);
-    } else if (curRoundPhase === "ANSWER_SUBMITTED") {
-      startAnimation(() => visitorRef.current?.setStatus("disappear"));
-      setIsVisibleAnswer(false);
-      setIsVisibleActionBar(false);
-
-      if (!userAnswer) {
-        // 유저 answer이 guard 일 경우
-        startAnimation(() => backgroundRef?.current?.playGuardAnimation());
+    switch (curRoundPhase) {
+      case "NONE": {
+        resetStates();
+        break;
       }
-    } else if (curRoundPhase === "ROUND_ENDED") {
-      reportRoundOutcome({ isCorrect: isCorrect(userAnswer!) });
+
+      case "ROUND_START": {
+        backgroundRef.current!.playIdleAnimation();
+        startAnimation(() => setIsVisibleVisitor(true));
+        break;
+      }
+
+      case "PRESENTING_QUESTION": {
+        setIsVisibleAnswer(true);
+        setIsVisibleActionBar(true);
+        break;
+      }
+
+      case "ANSWER_SUBMITTED": {
+        startAnimation(() => visitorRef.current?.setStatus("disappear"));
+        setIsVisibleAnswer(false);
+        setIsVisibleActionBar(false);
+
+        if (!userAnswer) {
+          startAnimation(() => backgroundRef?.current?.playGuardAnimation());
+        }
+        break;
+      }
+
+      case "SHOW_RESULT": {
+        if (isCorrect(userAnswer!)) {
+          setRoundResult(ROUND_RESULT.RIGHT);
+        } else {
+          setRoundResult(ROUND_RESULT.WRONG);
+        }
+
+        startAnimation(() => setIsVisibleRoundResult(true));
+
+        break;
+      }
+
+      case "ROUND_ENDED": {
+        reportRoundOutcome({ isCorrect: isCorrect(userAnswer!) });
+        break;
+      }
+
+      default:
+        break;
     }
   }, [curRoundPhase]);
 
@@ -181,6 +228,9 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
         updatePendingAnimationsCount,
         submitAnswer,
         setCorrectAnswer,
+        isVisibleRoundResult,
+        setIsVisibleRoundResult,
+        roundResult,
       }}
     >
       {children}

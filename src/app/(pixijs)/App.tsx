@@ -14,14 +14,14 @@ import { StageProvider, useStageManager } from "./hooks/use-stage-manager";
 
 import { useShallow } from "zustand/shallow";
 
-import OptionIcon from "@/assets/icons/options_icon.svg?react";
 import { useMenuStore } from "@/store/useMenuStore";
 
-import { PauseMenu } from "@/components/overlay/menu/PauseMenu";
 import { MainMenu } from "@/components/overlay/menu/MainMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import MonacoEditor from "@/components/overlay/MonacoEditor";
-import Image from "next/image";
+import { ActionBar } from "@/components/overlay/actionBar/ActionBar";
+import { TopHUD } from "@/components/overlay/hud/TopHUD";
+import { RoundAnswerResult } from "@/components/overlay/result/RoundAnswerResult";
 
 extend({
   Graphics,
@@ -58,83 +58,40 @@ export default function AppContainer() {
 }
 
 function HTMLOverlay() {
-  const { curRoundQuiz, isVisibleOption, isPaused } = useStageManager();
+  const { curRoundQuiz, isVisibleTopHUD, isPaused } = useStageManager();
 
-  const { curRoundPhase, submitAnswer, isVisibleAnswer, isVisibleActionBar } =
+  const { isVisibleAnswer, isVisibleActionBar, isVisibleRoundResult } =
     useRoundManager();
 
-  const [isMenuOpen, menuOverlay, setMenuOverlay, openMenu] = useMenuStore(
-    useShallow((state) => [
-      state.isMenuOpen,
-      state.menuOverlay,
-      state.setMenuOverlay,
-      state.openMenu,
-    ])
+  const [isMenuOpen, menuOverlay] = useMenuStore(
+    useShallow((state) => [state.isMenuOpen, state.menuOverlay])
   );
   return (
     <>
-      (
-      <>
-        {/* option 창 */}
-        {isVisibleOption && (
-          <div
-            className="absolute top-0 right-0 w-1/12 h-1/12 hover:cursor-pointer p-2 opacity-50"
-            onClick={() => {
-              openMenu();
-              setMenuOverlay(<PauseMenu />);
-            }}
-          >
-            <OptionIcon fill="#808080" />
-          </div>
-        )}
-        {/* answer */}
-        <div
-          className={`absolute bottom-[45%] h-1/5 w-1/2 left-1/4 ${
-            !isVisibleAnswer && "hidden"
-          }`}
-        >
-          <div className="relative inline-block bg-white h-full w-full px-2 py-2 rounded-xl shadow-md">
-            {/* {curRoundQuiz?.answer} */}
-            <MonacoEditor value={curRoundQuiz?.question} />
-            <div className="absolute left-1/2 bottom-[-8px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white"></div>
-          </div>
+      {/* top HUD */}
+      {isVisibleTopHUD && <TopHUD />}
+      {/* question */}
+      <div
+        className={`absolute bottom-[45%] h-1/5 w-1/2 left-1/4 ${
+          !isVisibleAnswer && "hidden"
+        }`}
+      >
+        <div className="relative inline-block bg-white h-full w-full px-2 py-2 rounded-xl shadow-md">
+          {/* {curRoundQuiz?.answer} */}
+          <MonacoEditor value={curRoundQuiz?.question} />
+          <div className="absolute left-1/2 bottom-[-8px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white"></div>
         </div>
-        {/* action bar */}
-        {isVisibleActionBar && (
-          <footer className="absolute bottom-0 gap-[5%] w-full h-1/6 flex justify-center">
-            <button
-              className="w-1/5 hover:cursor-pointer disabled:opacity-50"
-              disabled={curRoundPhase !== "PRESENTING_QUESTION"}
-              onClick={() => submitAnswer(true)}
-            >
-              <Image
-                src="/assets/ui/pass_button.png"
-                alt="pass_button"
-                width={500}
-                height={100}
-              />
-            </button>
-            <button
-              className="w-1/5 hover:cursor-pointer disabled:opacity-50"
-              disabled={curRoundPhase !== "PRESENTING_QUESTION"}
-              onClick={() => submitAnswer(false)}
-            >
-              <Image
-                src="/assets/ui/guard_button.png"
-                alt="pass_button"
-                width={500}
-                height={100}
-              />
-            </button>
-          </footer>
-        )}
-      </>
-      ){/* menu */}
+      </div>
+      {/* action bar */}
+      {isVisibleActionBar && <ActionBar />}
+      {/* menu */}
       {isMenuOpen && menuOverlay}
       {/* pause */}
       {isPaused && (
-        <div className="absolute top-0 w-full h-full backdrop-blur-md"></div>
+        <div className="absolute top-0 w-full h-full backdrop-blur-md" />
       )}
+      {/* answer result */}
+      {isVisibleRoundResult && <RoundAnswerResult />}
     </>
   );
 }
