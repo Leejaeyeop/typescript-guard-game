@@ -19,8 +19,7 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
-    editorRef.current?.setValue(value ?? "");
-
+    // 에러가 발생 했을때만 호출 되는 이벤트
     // 에러는 코드상 체크하되, 마커 UI는 지움
     monaco.editor.onDidChangeMarkers(() => {
       const model = editor.getModel();
@@ -41,6 +40,8 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
 
   useEffect(() => {
     if (!value) return;
+
+    setCorrectAnswer(true);
     editorRef.current?.setValue(value);
   }, [value]);
 
@@ -78,8 +79,6 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
           selectionHighlight: false,
           selectionClipboard: false,
           dragAndDrop: false, // ⛔ 드래그 금지
-
-          autoIndent: "full",
         }}
       />
     </div>
