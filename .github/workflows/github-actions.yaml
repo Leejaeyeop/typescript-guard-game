@@ -18,8 +18,7 @@ jobs:
         id: diff
         run: |
           echo "Checking file changes..."
-          git fetch origin ci/github-actions
-          DIFF_FILES=$(git diff --name-only origin/ci/github-actions...HEAD)
+          DIFF_FILES=$(git diff --name-only HEAD~1)
 
           echo "Changed files:"
           echo "$DIFF_FILES"
