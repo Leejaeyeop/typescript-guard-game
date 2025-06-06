@@ -155,6 +155,7 @@ export const StageProvider = ({
         resetStates();
         if (totalQuizzes.length === 0) {
           window.alert("Quiz data does not exist.");
+          return;
         }
 
         // test api 호출
