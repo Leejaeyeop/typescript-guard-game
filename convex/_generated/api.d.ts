@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as quizzes from "../quizzes.js";
+import type * as shame from "../shame.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,6 +26,7 @@ import type * as quizzes from "../quizzes.js";
  */
 declare const fullApi: ApiFromModules<{
   quizzes: typeof quizzes;
+  shame: typeof shame;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
