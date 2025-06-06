@@ -2,7 +2,7 @@ name: Convex and Vercel CI
 
 on:
   push:
-    branches: [ci/github-actions]
+    branches: [main]
 
 jobs:
   check-diff:
@@ -67,7 +67,7 @@ jobs:
       - name: Login to Convex
         run: npx convex login --token ${{ secrets.CONVEX_DEPLOY_KEY }}
       - name: Deploy Convex functions
-        run: npx convex deploy --prod
+        run: npx convex deploy
 
   import-quizzes:
     needs: check-diff
