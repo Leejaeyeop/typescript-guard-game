@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef } from "react";
-import Editor, { OnMount } from "@monaco-editor/react";
+import Editor, { BeforeMount, OnMount } from "@monaco-editor/react";
 import { useRoundManager } from "@/app/(pixijs)/hooks/use-round-manager";
 
 import * as monacoEditor from "monaco-editor";
@@ -18,7 +18,6 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
 
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
-
     // 에러가 발생 했을때만 호출 되는 이벤트
     // 에러는 코드상 체크하되, 마커 UI는 지움
     monaco.editor.onDidChangeMarkers(() => {
@@ -27,7 +26,6 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
 
       const markers = monaco.editor.getModelMarkers({ resource: model.uri });
 
-      // 마커를 수동 제거 (UI 상 안 보이게 함)
       monaco.editor.setModelMarkers(model, "owner", []);
 
       // 코드 상에서는 에러 있는지 추적
@@ -38,6 +36,30 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
     });
   };
 
+  const handleEditorBeforeMount: BeforeMount = (monaco) => {
+    // 컴파일러 옵션 설정
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ESNext,
+      // important!
+      allowNonTsExtensions: true,
+      module: monaco.languages.typescript.ModuleKind.ESNext,
+      strict: true,
+      noImplicitAny: true,
+      strictNullChecks: true,
+      strictFunctionTypes: true,
+      strictBindCallApply: true,
+      strictPropertyInitialization: true,
+      noImplicitThis: true,
+      alwaysStrict: true,
+      noImplicitReturns: true,
+    });
+
+    // 진단 옵션 설정
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: false,
+      noSyntaxValidation: false,
+    });
+  };
   useEffect(() => {
     if (!value) return;
 
@@ -64,12 +86,12 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
         height="100%"
         width="100%"
         defaultLanguage="typescript"
+        beforeMount={handleEditorBeforeMount}
         onMount={handleEditorMount}
         theme="vs-dark"
         options={{
           readOnly: true,
           glyphMargin: false,
-          lineNumbers: "off",
           minimap: { enabled: false },
           contextmenu: false, // 우클릭 메뉴 비활성화
           // width 값을 고정시킨다.
