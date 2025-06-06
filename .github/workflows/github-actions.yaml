@@ -13,6 +13,8 @@ jobs:
       data_changed: ${{ steps.diff.outputs.data_changed }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # HEAD~1 비교용
 
       - name: Check file changes
         id: diff
