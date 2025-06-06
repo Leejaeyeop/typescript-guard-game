@@ -1,0 +1,113 @@
+name: Convex and Vercel CI
+
+on:
+  push:
+    branches: [ci/github-actions]
+
+jobs:
+  check-diff:
+    runs-on: ubuntu-latest
+    outputs:
+      src_changed: ${{ steps.diff.outputs.src_changed }}
+      convex_changed: ${{ steps.diff.outputs.convex_changed }}
+      data_changed: ${{ steps.diff.outputs.data_changed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check file changes
+        id: diff
+        run: |
+          echo "Checking file changes..."
+          git fetch origin main
+          DIFF_FILES=$(git diff --name-only origin/main...HEAD)
+
+          echo "Changed files:"
+          echo "$DIFF_FILES"
+
+          echo "src_changed=$(echo "$DIFF_FILES" | grep -q '^src/' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "convex_changed=$(echo "$DIFF_FILES" | grep -q '^convex/' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "data_changed=$(echo "$DIFF_FILES" | grep -q '^data/quizzesData.jsonl$' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  vercel-deployment:
+    needs: check-diff
+    if: needs.check-diff.outputs.src_changed == 'true'
+    name: Vercel Production Deployment
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+  deploy-functions:
+    needs: check-diff
+    if: needs.check-diff.outputs.convex_changed == 'true' && needs.check-diff.outputs.src_changed != 'true'
+    runs-on: ubuntu-latest
+    name: Deploy Convex Functions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Login to Convex
+        run: npx convex login --token ${{ secrets.CONVEX_DEPLOY_KEY }}
+      - name: Deploy Convex functions
+        run: npx convex deploy --prod
+
+  import-quizzes:
+    needs: check-diff
+    if: needs.check-diff.outputs.data_changed == 'true'
+    runs-on: ubuntu-latest
+    name: Import Questions + Revalidate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Import data to Convex
+        run: npx convex import --table quizzes data/quizzesData.jsonl --replace --yes
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+      - name: Revalidate Next.js Cache
+        id: revalidate_cache
+        run: |
+          if [ -z "${{ secrets.VERCEL_PROJECT_URL }}" ] || [ -z "${{ secrets.REVALIDATION_SECRET }}" ]; then
+            echo "Error: VERCEL_PROJECT_URL or REVALIDATION_SECRET is not set."
+            exit 1
+          fi
+
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          SUCCESS=false
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempting to revalidate cache (attempt $((RETRY_COUNT + 1)))..."
+            RESPONSE=$(curl -s -X POST \
+              -H "x-revalidate-secret: ${{ secrets.REVALIDATION_SECRET }}" \
+              "${{ secrets.VERCEL_PROJECT_URL }}/api/revalidate") 
+
+            if echo "$RESPONSE" | grep -q '"revalidated":true'; then 
+              echo "Cache revalidation successful: $RESPONSE"
+              SUCCESS=true
+              break
+            else
+              echo "Cache revalidation failed (attempt $((RETRY_COUNT + 1))): $RESPONSE"
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              sleep 5 
+            fi
+          done
+
+          if [ "$SUCCESS" = false ]; then
+            echo "Failed to revalidate cache after $MAX_RETRIES attempts."
+            exit 1 
+          fi
