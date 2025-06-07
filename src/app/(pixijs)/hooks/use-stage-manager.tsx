@@ -21,7 +21,7 @@ type StageContextType = {
   curRoundIdx: number;
   setCurRoundIdx: Dispatch<SetStateAction<number>>;
   // 퀴즈들
-  quizzes: Quiz[];
+  curStageQuizzes: Quiz[];
   curStagePhase: (typeof stagePhase)[number];
   setStagePhaseIdx: Dispatch<SetStateAction<number>>;
   setStageDifficultyLevel: Dispatch<SetStateAction<DifficultyLevel | null>>;
@@ -48,15 +48,54 @@ const initialStageState = {
   stageDifficultyLevel: null,
   correctCount: 0,
   curRoundIdx: 0,
-  quizzes: [],
+  curStageQuizzes: [],
   isVisibleTopHUD: false,
   isPaused: false,
-  lifePoints: 5,
+  lifePoints: 2,
 };
 const StageContext = createContext<StageContextType | undefined>(undefined);
 
 // 전체 문제 갯수
 export const TOTAL_NUMBER_OF_QUESTIONS = 20;
+
+/**
+ * 전체 퀴즈 목록에서 특정 난이도의 퀴즈를
+ * 최대 N개까지 무작위로 추출하는 함수
+ * @param totalQuizzes - 모든 퀴즈가 담긴 배열
+ * @param stageDifficultyLevel - 추출할 퀴즈의 난이도 ('easy', 'medium', 'hard')
+ * @returns 무작위로 추출된 퀴즈 배열
+ */
+function getRandomQuizzesByDifficulty(
+  totalQuizzes: Quiz[],
+  stageDifficultyLevel: DifficultyLevel
+): Quiz[] {
+  // 1. 필터링: 원하는 난이도의 퀴즈만 골라냅니다.
+  const filteredQuizzes = totalQuizzes.filter(
+    (quiz) => quiz.difficultyLevel === stageDifficultyLevel
+  );
+
+  // 2. 순서 섞기 (Fisher-Yates Shuffle 알고리즘)
+  // 원본 배열을 해치지 않기 위해 배열을 복사해서 사용합니다.
+  const shuffledQuizzes = [...filteredQuizzes];
+  let currentIndex = shuffledQuizzes.length;
+  let randomIndex;
+
+  // 배열의 마지막 요소부터 처음까지 순회합니다.
+  while (currentIndex !== 0) {
+    // 남은 요소 중에서 무작위 인덱스를 선택합니다.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // 현재 요소와 무작위로 선택된 요소를 교환합니다.
+    [shuffledQuizzes[currentIndex], shuffledQuizzes[randomIndex]] = [
+      shuffledQuizzes[randomIndex],
+      shuffledQuizzes[currentIndex],
+    ];
+  }
+
+  // 3. 잘라내기: 섞인 배열의 앞에서부터 최대 문제 개수만큼 잘라냅니다.
+  return shuffledQuizzes.slice(0, TOTAL_NUMBER_OF_QUESTIONS);
+}
 
 interface StageProviderProps {
   children: ReactNode;
@@ -84,7 +123,7 @@ export const StageProvider = ({
   );
   const [curRoundIdx, setCurRoundIdx] = useState(initialStageState.curRoundIdx);
   const [isPaused, setIsPaused] = useState(initialStageState.isPaused);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [curStageQuizzes, setCurStageQuizzes] = useState<Quiz[]>([]);
   const [lifePoints, setLifePoints] = useState(initialStageState.lifePoints);
 
   const { openMenu, setMenuOverlay } = useMenuStore();
@@ -94,7 +133,7 @@ export const StageProvider = ({
     setCorrectCount(initialStageState.correctCount);
     setIsVisibleTopHUD(initialStageState.isVisibleTopHUD);
     setCurRoundIdx(initialStageState.curRoundIdx);
-    setQuizzes(initialStageState.quizzes);
+    setCurStageQuizzes(initialStageState.curStageQuizzes);
     setIsPaused(initialStageState.isPaused);
     setLifePoints(initialStageState.lifePoints);
   };
@@ -108,8 +147,8 @@ export const StageProvider = ({
   }, [stagePhaseIdx]);
 
   const curRoundQuiz = useMemo<Quiz>(() => {
-    return quizzes[curRoundIdx];
-  }, [quizzes, curRoundIdx]);
+    return curStageQuizzes[curRoundIdx];
+  }, [curStageQuizzes, curRoundIdx]);
 
   const reportRoundOutcome = ({ isCorrect }: { isCorrect: boolean }) => {
     // 점수 획득
@@ -125,7 +164,7 @@ export const StageProvider = ({
       }
     }
 
-    if (curRoundIdx === quizzes.length - 1) {
+    if (curRoundIdx === curStageQuizzes.length - 1) {
       // 퀴즈가 전부 종료됨
       setStagePhaseIdx(stagePhaseIdx + 1);
     } else {
@@ -153,13 +192,15 @@ export const StageProvider = ({
       case "PREPARE": {
         // 재시작 / 다음 스테이지 바로 시작 등을 상정
         resetStates();
-        if (totalQuizzes.length === 0) {
+        if (totalQuizzes.length === 0 || !stageDifficultyLevel) {
           window.alert("Quiz data does not exist.");
           return;
         }
 
-        // test api 호출
-        setQuizzes(totalQuizzes);
+        // 퀴즈를 필터링 하자!
+        setCurStageQuizzes(
+          getRandomQuizzesByDifficulty(totalQuizzes, stageDifficultyLevel)
+        );
         setIsVisibleTopHUD(true);
 
         // 다음 페이즈 시작
@@ -206,7 +247,7 @@ export const StageProvider = ({
   return (
     <StageContext.Provider
       value={{
-        quizzes,
+        curStageQuizzes,
         curRoundIdx,
         setCurRoundIdx,
         curStagePhase,

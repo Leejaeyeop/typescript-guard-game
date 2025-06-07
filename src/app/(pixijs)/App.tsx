@@ -2,7 +2,7 @@
 
 import { Application, ApplicationRef, extend } from "@pixi/react";
 import { Container, Graphics, Sprite, AnimatedSprite } from "pixi.js";
-import { useEffect, useRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { MAX_SIZE } from "./constants/sizes";
 import { useRoundManager } from "./hooks/use-round-manager";
 import { useResize } from "./hooks/use-resize";
@@ -33,9 +33,11 @@ interface AppContainerInterface {
 
 export default function AppContainer({ totalQuizzes }: AppContainerInterface) {
   const appContainerRef = useRef<HTMLDivElement>(null);
+  useResize(appContainerRef);
+
   const { setMenuOverlay, openMenu } = useMenuStore();
   const { activeScene } = useAppStore();
-  useResize(appContainerRef);
+  const [isLoading, setIsLoading] = useState(true);
 
   // main menu scene 설정 직후
   useEffect(() => {
@@ -46,18 +48,28 @@ export default function AppContainer({ totalQuizzes }: AppContainerInterface) {
   }, [activeScene]);
 
   return (
-    <div className="relative" ref={appContainerRef}>
+    <div id="appContainer" className="relative" ref={appContainerRef}>
+      {isLoading && (
+        <div className="absolute top-0 z-[999] w-full h-full flex items-center justify-center bg-black">
+          <p className="text-white text-6xl animate-pulse">Loading...</p>
+        </div>
+      )}
       <StageProvider totalQuizzes={totalQuizzes}>
         <RoundProvider>
-          <App />
-          <HTMLOverlay />
+          <App setIsLoading={setIsLoading} />
+          <div className={`${isLoading && "opacity-0"}`}>
+            <HTMLOverlay />
+          </div>
         </RoundProvider>
       </StageProvider>
     </div>
   );
 }
 
-function App() {
+interface AppProps {
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+}
+function App({ setIsLoading }: AppProps) {
   const appRef = useRef<ApplicationRef>(null);
   const { backgroundRef, visitorRef, isVisibleVisitor } = useRoundManager();
 
@@ -69,7 +81,7 @@ function App() {
       height={MAX_SIZE}
     >
       <pixiContainer anchor={0.5}>
-        <BackgroundSprite ref={backgroundRef} />
+        <BackgroundSprite setIsLoading={setIsLoading} ref={backgroundRef} />
         {isVisibleVisitor && <VisitorSprite ref={visitorRef} />}
       </pixiContainer>
     </Application>
