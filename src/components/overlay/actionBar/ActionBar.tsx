@@ -16,6 +16,7 @@ export function ActionBar() {
           width={500}
           height={100}
           loading="eager"
+          priority={true}
         />
       </button>
       <button
@@ -29,6 +30,7 @@ export function ActionBar() {
           width={500}
           height={100}
           loading="eager"
+          priority={true}
         />
       </button>
     </footer>

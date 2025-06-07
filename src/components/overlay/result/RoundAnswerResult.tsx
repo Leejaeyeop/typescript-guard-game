@@ -29,6 +29,7 @@ export function RoundAnswerResult() {
             alt="result_text"
             fill
             loading="eager"
+            priority={true}
           />
         ) : (
           <Image
@@ -36,6 +37,7 @@ export function RoundAnswerResult() {
             alt="wrong_text"
             fill
             loading="eager"
+            priority={true}
           />
         )}
       </div>
