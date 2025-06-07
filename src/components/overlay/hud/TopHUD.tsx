@@ -1,8 +1,8 @@
 import { useMenuStore } from "@/store/useMenuStore";
 import { useShallow } from "zustand/shallow";
 import { PauseMenu } from "../menu/PauseMenu";
-import OptionIcon from "@/assets/icons/options_icon.svg?react";
 import { useStageManager } from "@/app/(pixijs)/hooks/use-stage-manager";
+import Image from "next/image";
 
 export function TopHUD() {
   const [setMenuOverlay, openMenu] = useMenuStore(
@@ -32,7 +32,14 @@ export function TopHUD() {
           setMenuOverlay(<PauseMenu />);
         }}
       >
-        <OptionIcon fill="#ccc" />
+        <Image
+          src="/assets/ui/option.webp"
+          alt="option"
+          width={100}
+          height={100}
+          loading="eager"
+          priority={true}
+        />
       </div>
     </header>
   );

@@ -57,7 +57,7 @@ export default function AppContainer({ totalQuizzes }: AppContainerInterface) {
       <StageProvider totalQuizzes={totalQuizzes}>
         <RoundProvider>
           <App setIsLoading={setIsLoading} />
-          <div className={`${isLoading && "opacity-0"}`}>
+          <div className={`${isLoading && "hidden"}`}>
             <HTMLOverlay />
           </div>
         </RoundProvider>
