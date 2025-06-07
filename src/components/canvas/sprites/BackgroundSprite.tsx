@@ -8,7 +8,15 @@ import {
   FrameObject,
   Texture,
 } from "pixi.js";
-import { useEffect, useRef, useState, useImperativeHandle, Ref } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useImperativeHandle,
+  Ref,
+  Dispatch,
+  SetStateAction,
+} from "react";
 
 const spritesPath = {
   idle1: "assets/background/idle/idle1.jpeg",
@@ -36,8 +44,10 @@ export type BackgroundSpriteHandle = {
 
 export function BackgroundSprite({
   ref,
+  setIsLoading,
 }: {
   ref: Ref<BackgroundSpriteHandle>;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
 }) {
   const spriteRef = useRef<AnimatedSprite>(null);
   const animations =
@@ -86,16 +96,12 @@ export function BackgroundSprite({
     setLoop(false);
   };
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        playGuardAnimation,
-        playIdleAnimation,
-      };
-    },
-    []
-  );
+  useImperativeHandle(ref, () => {
+    return {
+      playGuardAnimation,
+      playIdleAnimation,
+    };
+  }, []);
   // guard -> guard_idle -> guard -> idle (역순)
 
   // Preload the sprite if it hasn't been loaded yet
@@ -105,6 +111,7 @@ export function BackgroundSprite({
     Assets.loadBundle("animationAssets").then((result) => {
       animations.current = result;
       playIdleAnimation();
+      setIsLoading(false);
     });
   }, []);
 
