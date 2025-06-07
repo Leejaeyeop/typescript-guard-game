@@ -25,7 +25,7 @@ export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
   // Preload the sprite if it hasn't been loaded yet
   useEffect(() => {
     if (texture === Texture.EMPTY) {
-      Assets.load(`assets/visitors/visitor${getRandomNumber()}.png`).then(
+      Assets.load(`assets/visitors/visitor${getRandomNumber()}.webp`).then(
         (result) => {
           setTexture(result);
         }
@@ -52,17 +52,13 @@ export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
     }
   });
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        setStatus: (newState) => {
-          status.current = newState;
-        },
-      };
-    },
-    []
-  );
+  useImperativeHandle(ref, () => {
+    return {
+      setStatus: (newState) => {
+        status.current = newState;
+      },
+    };
+  }, []);
 
   return (
     <pixiSprite
