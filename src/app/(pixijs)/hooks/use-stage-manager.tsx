@@ -21,7 +21,7 @@ type StageContextType = {
   curRoundIdx: number;
   setCurRoundIdx: Dispatch<SetStateAction<number>>;
   // 퀴즈들
-  quizzes: Quiz[];
+  curStageQuizzes: Quiz[];
   curStagePhase: (typeof stagePhase)[number];
   setStagePhaseIdx: Dispatch<SetStateAction<number>>;
   setStageDifficultyLevel: Dispatch<SetStateAction<DifficultyLevel | null>>;
@@ -48,10 +48,10 @@ const initialStageState = {
   stageDifficultyLevel: null,
   correctCount: 0,
   curRoundIdx: 0,
-  quizzes: [],
+  curStageQuizzes: [],
   isVisibleTopHUD: false,
   isPaused: false,
-  lifePoints: 5,
+  lifePoints: 2,
 };
 const StageContext = createContext<StageContextType | undefined>(undefined);
 
@@ -123,7 +123,7 @@ export const StageProvider = ({
   );
   const [curRoundIdx, setCurRoundIdx] = useState(initialStageState.curRoundIdx);
   const [isPaused, setIsPaused] = useState(initialStageState.isPaused);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [curStageQuizzes, setCurStageQuizzes] = useState<Quiz[]>([]);
   const [lifePoints, setLifePoints] = useState(initialStageState.lifePoints);
 
   const { openMenu, setMenuOverlay } = useMenuStore();
@@ -133,7 +133,7 @@ export const StageProvider = ({
     setCorrectCount(initialStageState.correctCount);
     setIsVisibleTopHUD(initialStageState.isVisibleTopHUD);
     setCurRoundIdx(initialStageState.curRoundIdx);
-    setQuizzes(initialStageState.quizzes);
+    setCurStageQuizzes(initialStageState.curStageQuizzes);
     setIsPaused(initialStageState.isPaused);
     setLifePoints(initialStageState.lifePoints);
   };
@@ -147,8 +147,8 @@ export const StageProvider = ({
   }, [stagePhaseIdx]);
 
   const curRoundQuiz = useMemo<Quiz>(() => {
-    return quizzes[curRoundIdx];
-  }, [quizzes, curRoundIdx]);
+    return curStageQuizzes[curRoundIdx];
+  }, [curStageQuizzes, curRoundIdx]);
 
   const reportRoundOutcome = ({ isCorrect }: { isCorrect: boolean }) => {
     // 점수 획득
@@ -164,7 +164,7 @@ export const StageProvider = ({
       }
     }
 
-    if (curRoundIdx === quizzes.length - 1) {
+    if (curRoundIdx === curStageQuizzes.length - 1) {
       // 퀴즈가 전부 종료됨
       setStagePhaseIdx(stagePhaseIdx + 1);
     } else {
@@ -198,7 +198,7 @@ export const StageProvider = ({
         }
 
         // 퀴즈를 필터링 하자!
-        setQuizzes(
+        setCurStageQuizzes(
           getRandomQuizzesByDifficulty(totalQuizzes, stageDifficultyLevel)
         );
         setIsVisibleTopHUD(true);
@@ -247,7 +247,7 @@ export const StageProvider = ({
   return (
     <StageContext.Provider
       value={{
-        quizzes,
+        curStageQuizzes,
         curRoundIdx,
         setCurRoundIdx,
         curStagePhase,
