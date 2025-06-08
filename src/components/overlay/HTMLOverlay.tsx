@@ -32,9 +32,7 @@ export default function HTMLOverlay() {
       {isVisibleTopHUD && <TopHUD />}
       {/* question */}
       <ResizableContainer hidden={!isVisibleAnswer}>
-        {/* <div className="relative inline-block bg-white h-full w-full px-2 py-2 rounded-xl shadow-md"> */}
         <MonacoEditor value={curRoundQuiz?.question} />
-        {/* </div> */}
       </ResizableContainer>
       {/* action bar */}
       {isVisibleActionBar && <ActionBar />}
