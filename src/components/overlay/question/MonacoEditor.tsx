@@ -67,18 +67,18 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
     editorRef.current?.setValue(value);
   }, [value]);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const resizeObserver = new ResizeObserver(() => {
-      if (editorRef.current) {
-        editorRef.current.layout();
-      }
-    });
+  // useEffect(() => {
+  //   if (!containerRef.current) return;
+  //   const resizeObserver = new ResizeObserver(() => {
+  //     if (editorRef.current) {
+  //       editorRef.current.layout();
+  //     }
+  //   });
 
-    resizeObserver.observe(containerRef.current);
+  //   resizeObserver.observe(containerRef.current);
 
-    return () => resizeObserver.disconnect();
-  }, [containerRef]);
+  //   return () => resizeObserver.disconnect();
+  // }, [containerRef]);
 
   return (
     <div ref={containerRef} className="h-full w-full">
@@ -91,7 +91,6 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
         theme="vs-dark"
         options={{
           readOnly: true,
-          glyphMargin: false,
           minimap: { enabled: false },
           contextmenu: false, // 우클릭 메뉴 비활성화
           // width 값을 고정시킨다.
@@ -101,6 +100,12 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
           selectionHighlight: false,
           selectionClipboard: false,
           dragAndDrop: false, // ⛔ 드래그 금지
+
+          // lineNumbers: 'off',
+          glyphMargin: false,
+          folding: false,
+          // lineDecorationsWidth: 0,
+          lineNumbersMinChars: 2,
         }}
       />
     </div>

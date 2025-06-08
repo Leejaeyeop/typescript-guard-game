@@ -34,7 +34,10 @@ export function MenuOverlay({ children }: { children: ReactNode }) {
       }}
     >
       <div className="absolute top-[15%] left-[15%] text-black w-[70%] h-[70%] bg-[url('/assets/ui/paper.webp')] bg-cover bg-center px-[20%] py-[15%] z-10">
-        <div className="flex flex-col h-full grow items-center gap-4 w-full [font-size:_clamp(1rem,1.3vw,2em)] font-bold">
+        <div
+          id="menu-content"
+          className="flex flex-col h-full grow items-center gap-4 w-full [font-size:_clamp(1rem,1.3vw,1.5em)] font-bold p-2 overflow-y-auto"
+        >
           {/* last components */}
           {menuContextDepth.at(-1)}
           {menuContextDepth.length > 1 && (

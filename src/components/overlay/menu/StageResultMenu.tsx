@@ -2,20 +2,23 @@ import { MenuOverlay, useMenuOverlay } from "./MenuOverlay";
 import { MenuButton } from "../button/MenuButton";
 import { SelectDifficultyLevel } from "./SelectDifficultyLevelMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
+import { useMenuStore } from "@/store/useMenuStore";
 
-interface ResultMenuProps {
+interface StageResultMenuProps {
   isFailed: boolean;
   TotalNumberOfQuestions: number;
   correctCount: number;
 }
 
-function ResultMenuContent({
+function StageResultMenuContent({
   isFailed = false,
   TotalNumberOfQuestions,
   correctCount,
-}: ResultMenuProps) {
+}: StageResultMenuProps) {
   const { pushMenuContext } = useMenuOverlay();
   const { setActiveScene } = useAppStore();
+
+  const setShowQuizReview = useMenuStore((state) => state.setShowQuizReview);
 
   return (
     <>
@@ -27,16 +30,16 @@ function ResultMenuContent({
         <>
           <div>Congratulations!</div>
           <div>
-            result score: {correctCount} / {TotalNumberOfQuestions}
+            score: {correctCount} / {TotalNumberOfQuestions}
           </div>
-          <MenuButton
-            onClick={() => pushMenuContext(<SelectDifficultyLevel />)}
-          >
-            Play other game
-          </MenuButton>
         </>
       )}
-
+      <MenuButton onClick={() => setShowQuizReview(true)}>
+        View Results
+      </MenuButton>
+      <MenuButton onClick={() => pushMenuContext(<SelectDifficultyLevel />)}>
+        Play other game
+      </MenuButton>
       <MenuButton
         onClick={() => {
           setActiveScene(SCENE_IDS.MAIN);
@@ -48,10 +51,10 @@ function ResultMenuContent({
   );
 }
 
-export function ResultMenu(props: ResultMenuProps) {
+export function StageResultMenu(props: StageResultMenuProps) {
   return (
     <MenuOverlay>
-      <ResultMenuContent {...props}></ResultMenuContent>
+      <StageResultMenuContent {...props}></StageResultMenuContent>
     </MenuOverlay>
   );
 }

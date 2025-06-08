@@ -9,6 +9,9 @@ interface ManuState {
   closeMenu: () => void;
   menuOverlay: ReactNode | null;
   setMenuOverlay: (content: ReactNode) => void;
+
+  showQuizReview: boolean;
+  setShowQuizReview: (state: boolean) => void;
 }
 
 // 스토어 생성
@@ -18,4 +21,7 @@ export const useMenuStore = create<ManuState>((set) => ({
   closeMenu: () => set({ isMenuOpen: false }),
   menuOverlay: <MainMenu />,
   setMenuOverlay: (content: ReactNode) => set({ menuOverlay: content }),
+
+  showQuizReview: false,
+  setShowQuizReview: (state: boolean) => set({ showQuizReview: state }),
 }));

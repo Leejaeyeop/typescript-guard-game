@@ -2,16 +2,18 @@ import {
   createContext,
   Dispatch,
   ReactNode,
+  RefObject,
   SetStateAction,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Quiz } from "@/types/quiz";
 import { DifficultyLevel } from "@/types/difficultyLevel";
 import { useMenuStore } from "@/store/useMenuStore";
-import { ResultMenu } from "@/components/overlay/menu/ResultMenu";
+import { StageResultMenu } from "@/components/overlay/menu/StageResultMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 
 type StageContextType = {
@@ -26,12 +28,21 @@ type StageContextType = {
   setStagePhaseIdx: Dispatch<SetStateAction<number>>;
   setStageDifficultyLevel: Dispatch<SetStateAction<DifficultyLevel | null>>;
   curRoundQuiz: Quiz;
-  reportRoundOutcome: (result: { isCorrect: boolean }) => void;
+  reportRoundOutcome: (result: {
+    isCorrect: boolean;
+    userAnswer: boolean;
+  }) => void;
   isVisibleTopHUD: boolean;
   initStage: () => void;
   isPaused: boolean;
   setIsPaused: Dispatch<SetStateAction<boolean>>;
   lifePoints: number;
+  userAnswerResults: RefObject<
+    ({
+      wasCorrect: boolean;
+      userAnswer: boolean;
+    } & Quiz)[]
+  >;
 };
 
 const stagePhase = [
@@ -126,6 +137,11 @@ export const StageProvider = ({
   const [curStageQuizzes, setCurStageQuizzes] = useState<Quiz[]>([]);
   const [lifePoints, setLifePoints] = useState(initialStageState.lifePoints);
 
+  // 라운드 인데스, 유저 정답 여부
+  const userAnswerResults = useRef<
+    ({ wasCorrect: boolean; userAnswer: boolean } & Quiz)[]
+  >([]);
+
   const { openMenu, setMenuOverlay } = useMenuStore();
 
   // reset 로직
@@ -136,6 +152,8 @@ export const StageProvider = ({
     setCurStageQuizzes(initialStageState.curStageQuizzes);
     setIsPaused(initialStageState.isPaused);
     setLifePoints(initialStageState.lifePoints);
+
+    userAnswerResults.current = [];
   };
 
   const initStage = () => {
@@ -150,10 +168,23 @@ export const StageProvider = ({
     return curStageQuizzes[curRoundIdx];
   }, [curStageQuizzes, curRoundIdx]);
 
-  const reportRoundOutcome = ({ isCorrect }: { isCorrect: boolean }) => {
+  // 라운드 결과 확인
+  const reportRoundOutcome = ({
+    isCorrect,
+    userAnswer,
+  }: {
+    isCorrect: boolean;
+    userAnswer: boolean;
+  }) => {
+    userAnswerResults.current.push({
+      ...curRoundQuiz,
+      wasCorrect: isCorrect,
+      userAnswer,
+    });
     // 점수 획득
     if (isCorrect) {
       setCorrectCount(correctCount + 1);
+      // 라운드 인덱스, 유저 정답 여부
     } else {
       setLifePoints(lifePoints - 1);
 
@@ -185,7 +216,6 @@ export const StageProvider = ({
     switch (curStagePhase) {
       case "NONE": {
         resetStates();
-        // api 호출
         break;
       }
 
@@ -228,9 +258,9 @@ export const StageProvider = ({
           isFailed = true;
         }
         setMenuOverlay(
-          <ResultMenu
+          <StageResultMenu
             isFailed={isFailed}
-            TotalNumberOfQuestions={TOTAL_NUMBER_OF_QUESTIONS}
+            TotalNumberOfQuestions={curStageQuizzes.length}
             correctCount={correctCount}
           />
         );
@@ -261,6 +291,7 @@ export const StageProvider = ({
         isPaused,
         setIsPaused,
         lifePoints,
+        userAnswerResults,
       }}
     >
       {children}

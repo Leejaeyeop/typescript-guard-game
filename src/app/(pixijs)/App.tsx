@@ -19,6 +19,7 @@ import HTMLOverlay from "@/components/overlay/HTMLOverlay";
 import { BackgroundSprite } from "@/components/canvas/sprites/BackgroundSprite";
 import { VisitorSprite } from "@/components/canvas/sprites/VisitorSprite";
 import { Quiz } from "@/types/quiz";
+import GuideMenu from "@/components/overlay/menu/GuideMenu";
 
 extend({
   Graphics,
@@ -40,10 +41,16 @@ export default function AppContainer({ totalQuizzes }: AppContainerInterface) {
   const [isLoading, setIsLoading] = useState(true);
 
   // main menu scene 설정 직후
+  const isFirstMount = useRef(true);
   useEffect(() => {
     if (activeScene === SCENE_IDS.MAIN) {
       openMenu();
-      setMenuOverlay(<MainMenu />);
+      if (isFirstMount.current) {
+        setMenuOverlay(<GuideMenu />);
+        isFirstMount.current = false;
+      } else {
+        setMenuOverlay(<MainMenu />);
+      }
     }
   }, [activeScene]);
 
@@ -57,7 +64,7 @@ export default function AppContainer({ totalQuizzes }: AppContainerInterface) {
       <StageProvider totalQuizzes={totalQuizzes}>
         <RoundProvider>
           <App setIsLoading={setIsLoading} />
-          <div className={`${isLoading && "opacity-0"}`}>
+          <div className={`${isLoading && "hidden"}`}>
             <HTMLOverlay />
           </div>
         </RoundProvider>
