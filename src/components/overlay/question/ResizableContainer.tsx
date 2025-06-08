@@ -119,7 +119,7 @@ const ResizableContainer = ({ children, hidden }: ResizableContainerProps) => {
         hidden && "hidden"
       } h-1/3 w-[70%] md:h-[25%] md:w-1/2 bg-gray-600 px-2 py-2 rounded-xl shadow-md`}
     >
-      <div className="h-5 flex text-black gap-4 justify-end">
+      <div className="h-5 flex text-white gap-4 justify-end">
         <button
           className="cursor-pointer text-xs hover:opacity-50"
           onClick={() => handleClick("MIN")}
