@@ -23,23 +23,22 @@ export function RoundAnswerResult() {
         className={`${bgMap[roundResult]} animate-fade-in-out w-full h-full opacity-0 absolute`}
       ></div>
       <div className="w-1/2 h-1/6 relative">
-        {roundResult === "RIGHT" ? (
-          <Image
-            src="/assets/ui/right_text.webp"
-            alt="result_text"
-            fill
-            loading="eager"
-            priority={true}
-          />
-        ) : (
-          <Image
-            src="/assets/ui/wrong_text.webp"
-            alt="wrong_text"
-            fill
-            loading="eager"
-            priority={true}
-          />
-        )}
+        <Image
+          className={`${roundResult !== "RIGHT" && "hidden"}`}
+          src="/assets/ui/right_text.webp"
+          alt="result_text"
+          fill
+          loading="eager"
+          priority={true}
+        />
+        <Image
+          className={`${roundResult !== "WRONG" && "hidden"}`}
+          src="/assets/ui/wrong_text.webp"
+          alt="wrong_text"
+          fill
+          loading="eager"
+          priority={true}
+        />
       </div>
     </div>
   );
