@@ -37,22 +37,19 @@ export default function AppContainer({ totalQuizzes }: AppContainerInterface) {
   useResize(appContainerRef);
 
   const { setMenuOverlay, openMenu } = useMenuStore();
-  const { activeScene } = useAppStore();
+  const { activeScene, dontShowAgain } = useAppStore();
   const [isLoading, setIsLoading] = useState(true);
-
   // main menu scene 설정 직후
-  const isFirstMount = useRef(true);
   useEffect(() => {
     if (activeScene === SCENE_IDS.MAIN) {
       openMenu();
-      if (isFirstMount.current) {
+      if (!dontShowAgain) {
         setMenuOverlay(<GuideMenu />);
-        isFirstMount.current = false;
       } else {
         setMenuOverlay(<MainMenu />);
       }
     }
-  }, [activeScene]);
+  }, [activeScene, dontShowAgain, setMenuOverlay, openMenu]);
 
   return (
     <div id="appContainer" className="relative" ref={appContainerRef}>
