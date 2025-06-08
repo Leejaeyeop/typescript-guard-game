@@ -6,5 +6,6 @@ export default defineSchema({
     id: v.number(),
     question: v.string(),
     difficultyLevel: v.string(),
+    explanation: v.string(),
   }).index("by_id", ["id"]),
 });

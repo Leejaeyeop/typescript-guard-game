@@ -115,7 +115,7 @@ const ResizableContainer = ({ children, hidden }: ResizableContainerProps) => {
   return (
     <div
       ref={boxRef}
-      className={`absolute bottom-[45%] left-1/2 transform -translate-x-1/2  ${
+      className={`absolute bottom-[45%] left-1/2 transform -translate-x-1/2 ${
         hidden && "hidden"
       } h-1/3 w-[70%] md:h-[25%] md:w-1/2 bg-gray-600 px-2 py-2 rounded-xl shadow-md`}
     >

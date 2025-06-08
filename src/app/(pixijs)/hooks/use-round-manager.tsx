@@ -205,7 +205,10 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
       }
 
       case "ROUND_ENDED": {
-        reportRoundOutcome({ isCorrect: isCorrect(userAnswer!) });
+        reportRoundOutcome({
+          isCorrect: isCorrect(userAnswer!),
+          userAnswer: userAnswer!,
+        });
         break;
       }
 

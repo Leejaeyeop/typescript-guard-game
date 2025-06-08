@@ -4,4 +4,5 @@ export interface Quiz {
   id: number;
   difficultyLevel: DifficultyLevel;
   question: string;
+  explanation: string;
 }

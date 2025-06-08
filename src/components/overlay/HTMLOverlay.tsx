@@ -8,6 +8,7 @@ import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import { useMenuStore } from "@/store/useMenuStore";
 import { useShallow } from "zustand/shallow";
 import ResizableContainer from "./question/ResizableContainer";
+import QuizReviewPage from "./result/QuizReview";
 
 export default function HTMLOverlay() {
   const { activeScene } = useAppStore();
@@ -16,9 +17,15 @@ export default function HTMLOverlay() {
   const { isVisibleAnswer, isVisibleActionBar, isVisibleRoundResult } =
     useRoundManager();
 
-  const [isMenuOpen, menuOverlay] = useMenuStore(
-    useShallow((state) => [state.isMenuOpen, state.menuOverlay])
+  const [isMenuOpen, menuOverlay, showQuizReview] = useMenuStore(
+    useShallow((state) => [
+      state.isMenuOpen,
+      state.menuOverlay,
+      state.showQuizReview,
+      state.setShowQuizReview,
+    ])
   );
+
   return (
     <>
       {/* top HUD */}
@@ -45,6 +52,7 @@ export default function HTMLOverlay() {
           <RoundAnswerResult />
         </div>
       )}
+      {showQuizReview && <QuizReviewPage />}
     </>
   );
 }
