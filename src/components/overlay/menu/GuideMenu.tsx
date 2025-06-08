@@ -2,13 +2,15 @@ import { useMenuStore } from "@/store/useMenuStore";
 import { MenuOverlay } from "./MenuOverlay";
 import { MenuButton } from "../button/MenuButton";
 import { MainMenu } from "./MainMenu";
+import { useAppStore } from "@/store/useAppStore";
 
 function GuideMenuContent() {
   const { setMenuOverlay } = useMenuStore();
+  const { dontShowAgain, setDontShowAgain } = useAppStore();
 
   return (
     <>
-      <section className="flex flex-col justify-center items-center text-center">
+      <section className="flex flex-col justify-center items-center text-center w-full">
         <h1 className="text-black text-2xl sm:text-4xl font-bold mb-3">
           Welcome to Type Guard
         </h1>
@@ -48,6 +50,23 @@ function GuideMenuContent() {
           order and chaos. Good luck, guard!
         </p>
       </section>
+
+      <div className="flex mt-2">
+        <input
+          type="checkbox"
+          id="dont-show-again"
+          className="h-4 w-5 rounded bg-zinc-700 border-zinc-600 text-blue-500 focus:ring-blue-500"
+          checked={dontShowAgain}
+          onChange={() => setDontShowAgain(!dontShowAgain)}
+        />
+        <label
+          htmlFor="dont-show-again"
+          className="ml-1 text-xs sm:text-sm text-black select-none"
+        >
+          Don&apos;t show again
+        </label>
+      </div>
+
       <MenuButton onClick={() => setMenuOverlay(<MainMenu />)}>
         Click to Play
       </MenuButton>
