@@ -65,7 +65,9 @@ const QuizReviewCard = ({
       </SyntaxHighlighter>
       {/* (선택 사항) 해설이 있다면 여기에 표시 */}
       {quiz.explanation && (
-        <p className="mt-3 text-sm text-zinc-400">{quiz.explanation}</p>
+        <p className="mt-3 text-sm sm:text-base text-zinc-400">
+          {quiz.explanation}
+        </p>
       )}
     </div>
   );

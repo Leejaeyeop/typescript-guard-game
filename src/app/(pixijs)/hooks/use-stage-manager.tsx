@@ -67,7 +67,7 @@ const initialStageState = {
 const StageContext = createContext<StageContextType | undefined>(undefined);
 
 // 전체 문제 갯수
-export const TOTAL_NUMBER_OF_QUESTIONS = 20;
+export const TOTAL_NUMBER_OF_QUESTIONS = 10;
 
 /**
  * 전체 퀴즈 목록에서 특정 난이도의 퀴즈를
