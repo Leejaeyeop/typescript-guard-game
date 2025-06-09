@@ -62,12 +62,12 @@ const initialStageState = {
   curStageQuizzes: [],
   isVisibleTopHUD: false,
   isPaused: false,
-  lifePoints: 2,
+  lifePoints: 3,
 };
 const StageContext = createContext<StageContextType | undefined>(undefined);
 
 // 전체 문제 갯수
-export const TOTAL_NUMBER_OF_QUESTIONS = 10;
+export const TOTAL_NUMBER_OF_QUESTIONS = 15;
 
 /**
  * 전체 퀴즈 목록에서 특정 난이도의 퀴즈를
