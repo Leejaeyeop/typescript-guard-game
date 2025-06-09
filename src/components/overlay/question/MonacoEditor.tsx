@@ -65,20 +65,8 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
 
     setCorrectAnswer(true);
     editorRef.current?.setValue(value);
+    editorRef.current?.revealLine(1);
   }, [value]);
-
-  // useEffect(() => {
-  //   if (!containerRef.current) return;
-  //   const resizeObserver = new ResizeObserver(() => {
-  //     if (editorRef.current) {
-  //       editorRef.current.layout();
-  //     }
-  //   });
-
-  //   resizeObserver.observe(containerRef.current);
-
-  //   return () => resizeObserver.disconnect();
-  // }, [containerRef]);
 
   return (
     <div ref={containerRef} className="h-full w-full">
