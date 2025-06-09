@@ -24,17 +24,17 @@ function StageResultMenuContent({
     <>
       {isFailed ? (
         <>
-          <div>Failed...</div>
+          <h2 className="text-2xl text-red-500 mb-3">Failed...</h2>
         </>
       ) : (
         <>
-          <div>Congratulations!</div>
+          <h2 className="text-2xl text-blue-500 mb-3">Success</h2>
           <div>
             score: {correctCount} / {TotalNumberOfQuestions}
           </div>
         </>
       )}
-      <MenuButton onClick={() => setShowQuizReview(true)}>
+      <MenuButton className="mb-5" onClick={() => setShowQuizReview(true)}>
         View Results
       </MenuButton>
       <MenuButton onClick={() => pushMenuContext(<SelectDifficultyLevel />)}>

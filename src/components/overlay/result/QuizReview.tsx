@@ -63,9 +63,17 @@ const QuizReviewCard = ({
       <SyntaxHighlighter language="typescript" style={dark} wrapLines={true}>
         {quiz.question}
       </SyntaxHighlighter>
+      {quiz.category && (
+        <p className="mt-3 text-sm sm:text-base text-white">
+          <strong className="text-blue-500">Category: </strong>
+          {quiz.category}
+        </p>
+      )}
       {/* (선택 사항) 해설이 있다면 여기에 표시 */}
       {quiz.explanation && (
-        <p className="mt-3 text-sm text-zinc-400">{quiz.explanation}</p>
+        <p className="mt-3 text-sm sm:text-base text-zinc-400">
+          {quiz.explanation}
+        </p>
       )}
     </div>
   );
