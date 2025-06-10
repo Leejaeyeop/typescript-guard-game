@@ -5,9 +5,11 @@ import { useRoundManager } from "@/contexts/RoundProvider";
 import passButton from "@/assets/ui/button/pass_button.webp";
 import guardButton from "@/assets/ui/button/guard_button.webp";
 
-export function ActionBar() {
-  const { roundState, submitAnswer } = useRoundManager();
-  const isActionDisabled = roundState.phase !== "PRESENTING_QUESTION";
+interface ActionBarProps {
+  isActionDisabled: boolean;
+}
+export function ActionBar({ isActionDisabled }: ActionBarProps) {
+  const { submitAnswer } = useRoundManager();
 
   return (
     <footer className="absolute bottom-0 w-full h-1/6">

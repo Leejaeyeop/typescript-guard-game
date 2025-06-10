@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useRef } from "react";
 import Editor, { BeforeMount, OnMount } from "@monaco-editor/react";
 import { useRoundManager } from "@/contexts/RoundProvider";
 
@@ -7,6 +7,7 @@ import * as monacoEditor from "monaco-editor";
 
 interface MonacoEditorProps {
   value: string | null;
+  setIsEditorMounted: Dispatch<SetStateAction<boolean>>;
 }
 
 // Monaco 에디터 자체의 옵션
@@ -26,7 +27,10 @@ const EDITOR_OPTIONS: monacoEditor.editor.IStandaloneEditorConstructionOptions =
     lineNumbersMinChars: 2,
   };
 
-export default function MonacoEditor({ value }: MonacoEditorProps) {
+export default function MonacoEditor({
+  value,
+  setIsEditorMounted,
+}: MonacoEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(
     null
@@ -34,6 +38,7 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
   const { setCorrectAnswer } = useRoundManager();
 
   const handleEditorMount: OnMount = (editor, monaco) => {
+    setIsEditorMounted(true);
     editorRef.current = editor;
     // 에러가 발생 했을때만 호출 되는 이벤트
     // 에러는 코드상 체크하되, 마커 UI는 지움

@@ -2,7 +2,7 @@ import { Quiz } from "@/types/quiz";
 import { DifficultyLevel } from "@/types/difficultyLevel";
 
 // The total number of questions to be used in a stage.
-export const TOTAL_NUMBER_OF_QUESTIONS = 15;
+export const TOTAL_NUMBER_OF_QUESTIONS = 20;
 
 /**
  * Filters and shuffles quizzes by a specific difficulty level,
