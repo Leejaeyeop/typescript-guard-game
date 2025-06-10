@@ -11,6 +11,7 @@ import {
   useMemo,
   Dispatch,
   useReducer,
+  useCallback,
 } from "react";
 import { useStageManager } from "./StageProvider";
 import { BackgroundSpriteHandle } from "@/features/game-canvas/components/sprites/BackgroundSprite";
@@ -170,8 +171,11 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   // 컴포넌트에서 사용하기 편하도록 dispatch를 래핑한 함수들
   const submitAnswer = (answer: boolean) =>
     roundStateDispatch({ type: "SUBMIT_ANSWER", payload: answer });
-  const setCorrectAnswer = (answer: boolean) =>
-    roundStateDispatch({ type: "SET_CORRECT_ANSWER", payload: answer });
+  const setCorrectAnswer = useCallback(
+    (answer: boolean) =>
+      roundStateDispatch({ type: "SET_CORRECT_ANSWER", payload: answer }),
+    []
+  );
 
   // 상위 컨텍스트(Stage)의 상태를 구독하여 라운드 상태 제어
   useEffect(() => {
@@ -220,6 +224,8 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
         });
         break;
     }
+    // NOTE: we intentionally run this effect only when `roundState.phase` changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundState.phase]);
 
   const contextValue = useMemo(
@@ -231,7 +237,7 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
       submitAnswer,
       setCorrectAnswer,
     }),
-    [roundState] // state 객체가 바뀔 때만 value가 새로 생성됨
+    [roundState, setCorrectAnswer] // state 객체가 바뀔 때만 value가 새로 생성됨
   );
 
   return (

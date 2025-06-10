@@ -240,6 +240,8 @@ export const StageProvider = ({
         break;
       }
     }
+    // NOTE: we intentionally run this effect only when `stageState.phase` changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stageState.phase]);
 
   const contextValue = useMemo(

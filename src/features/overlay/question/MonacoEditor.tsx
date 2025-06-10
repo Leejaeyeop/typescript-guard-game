@@ -66,7 +66,7 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
     setCorrectAnswer(true);
     editorRef.current?.setValue(value);
     editorRef.current?.revealLine(1);
-  }, [value]);
+  }, [value, setCorrectAnswer]);
 
   return (
     <div ref={containerRef} className="h-full w-full">

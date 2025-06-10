@@ -16,7 +16,7 @@ function PauseMenuContent() {
     return () => {
       stageStateDispatch({ type: "TOGGLE_PAUSE", payload: false });
     };
-  }, []);
+  }, [stageStateDispatch]);
 
   return (
     <>

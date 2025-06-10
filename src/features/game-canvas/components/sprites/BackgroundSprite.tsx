@@ -114,7 +114,7 @@ export function BackgroundSprite({ ref, setIsLoading }: BackgroundSpriteProps) {
       playIdleAnimation();
       setIsLoading(false);
     });
-  }, []);
+  }, [setIsLoading]);
 
   // 에니메이션 실행
   useEffect(() => {
