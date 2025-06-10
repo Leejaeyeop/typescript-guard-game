@@ -83,11 +83,11 @@ REVALIDATION_SECRET="[Your-strong-secret-token]"
 
 ```bash
 # 'quizzes' should be replaced with the actual table name defined in your Convex schema.
-npx convex import quizzes data/questions.jsonl
+npx convex import --table quizzes data/quizzesData.jsonl --replace --yes
 # or
-pnpm exec convex import quizzes data/questions.jsonl
+pnpm convex import --table quizzes data/quizzesData.jsonl --replace --yes
 # or
-bunx convex import quizzes data/questions.jsonl
+bunx convex import --table quizzes data/quizzesData.jsonl --replace --yes
 ```
 
 5. Run the Next.js Development Server
