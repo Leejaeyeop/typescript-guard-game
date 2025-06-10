@@ -75,7 +75,7 @@ interface AppProps {
 }
 function App({ setIsLoading }: AppProps) {
   const appRef = useRef<ApplicationRef>(null);
-  const { backgroundRef, visitorRef, isVisibleVisitor } = useRoundManager();
+  const { backgroundRef, visitorRef, roundState } = useRoundManager();
 
   return (
     <Application
@@ -86,7 +86,7 @@ function App({ setIsLoading }: AppProps) {
     >
       <pixiContainer anchor={0.5}>
         <BackgroundSprite setIsLoading={setIsLoading} ref={backgroundRef} />
-        {isVisibleVisitor && <VisitorSprite ref={visitorRef} />}
+        {roundState.isVisibleVisitor && <VisitorSprite ref={visitorRef} />}
       </pixiContainer>
     </Application>
   );

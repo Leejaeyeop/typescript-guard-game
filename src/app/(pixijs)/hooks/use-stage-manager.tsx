@@ -44,7 +44,7 @@ type StageState = {
 
 type StageContextType = {
   stageState: StageState;
-  dispatch: Dispatch<Action>;
+  stageStateDispatch: Dispatch<Action>;
   currentQuiz: Quiz;
   userAnswerResults: RefObject<UserAnswerResult[]>;
   initStage: () => void;
@@ -153,7 +153,10 @@ export const StageProvider = ({
   children,
   totalQuizzes,
 }: StageProviderProps) => {
-  const [stageState, dispatch] = useReducer(stageReducer, initialState);
+  const [stageState, stageStateDispatch] = useReducer(
+    stageReducer,
+    initialState
+  );
   const { activeScene } = useAppStore();
   const { openMenu, setMenuOverlay } = useMenuStore();
 
@@ -164,9 +167,9 @@ export const StageProvider = ({
   }, [stageState.quizzes, stageState.currentRoundIndex]);
 
   // Handler functions to simplify dispatching from components
-  const initStage = () => dispatch({ type: "INIT_STAGE" });
+  const initStage = () => stageStateDispatch({ type: "INIT_STAGE" });
   const setStageDifficulty = (level: DifficultyLevel) =>
-    dispatch({ type: "SET_DIFFICULTY", payload: level });
+    stageStateDispatch({ type: "SET_DIFFICULTY", payload: level });
 
   const reportRoundOutcome = useCallback(
     ({
@@ -182,7 +185,7 @@ export const StageProvider = ({
         userAnswer,
       });
 
-      dispatch({
+      stageStateDispatch({
         type: "REPORT_ROUND_OUTCOME",
         payload: { isCorrect, userAnswer },
       });
@@ -193,7 +196,7 @@ export const StageProvider = ({
   // Effect for handling scene changes from the app store
   useEffect(() => {
     if (activeScene === SCENE_IDS.MAIN) {
-      dispatch({ type: "RESET_TO_NONE" });
+      stageStateDispatch({ type: "RESET_TO_NONE" });
       userAnswerResults.current = [];
     }
   }, [activeScene]);
@@ -204,11 +207,11 @@ export const StageProvider = ({
       case "PREPARE":
         if (totalQuizzes.length === 0 || !stageState.difficultyLevel) {
           window.alert("Quiz data or difficulty level is missing.");
-          dispatch({ type: "RESET_TO_NONE" });
+          stageStateDispatch({ type: "RESET_TO_NONE" });
           return;
         }
 
-        dispatch({
+        stageStateDispatch({
           type: "PREPARE_STAGE",
           payload: {
             allQuizzes: totalQuizzes,
@@ -221,7 +224,7 @@ export const StageProvider = ({
 
       case "STAGE_START":
         // This is a great place for intro animations, then dispatching the next phase.
-        dispatch({ type: "START_STAGE" });
+        stageStateDispatch({ type: "START_STAGE" });
         break;
 
       case "STAGE_RESULTS": {
@@ -242,7 +245,7 @@ export const StageProvider = ({
   const contextValue = useMemo(
     () => ({
       stageState,
-      dispatch,
+      stageStateDispatch,
       currentQuiz,
       userAnswerResults,
       initStage,

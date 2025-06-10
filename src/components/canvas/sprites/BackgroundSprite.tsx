@@ -55,7 +55,7 @@ export function BackgroundSprite({
   const [textures, setTextures] = useState<AnimatedSpriteFrames>([
     Texture.EMPTY,
   ]);
-  const { updatePendingAnimationsCount } = useRoundManager();
+  const { roundStateDispatch } = useRoundManager();
   const [loop, setLoop] = useState(true);
 
   // idle
@@ -133,7 +133,7 @@ export function BackgroundSprite({
       height={MAX_SIZE}
       onComplete={() => {
         playIdleAnimation();
-        updatePendingAnimationsCount("decrement");
+        roundStateDispatch({ type: "ANIMATION_FINISHED" });
       }}
     />
   );

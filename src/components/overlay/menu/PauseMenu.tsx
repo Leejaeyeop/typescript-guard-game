@@ -8,13 +8,13 @@ import { useEffect } from "react";
 function PauseMenuContent() {
   const { closeMenu } = useMenuStore();
   const { setActiveScene } = useAppStore();
-  const { initStage, dispatch } = useStageManager();
+  const { initStage, stageStateDispatch } = useStageManager();
 
   useEffect(() => {
-    dispatch({ type: "TOGGLE_PAUSE", payload: true });
+    stageStateDispatch({ type: "TOGGLE_PAUSE", payload: true });
 
     return () => {
-      dispatch({ type: "TOGGLE_PAUSE", payload: false });
+      stageStateDispatch({ type: "TOGGLE_PAUSE", payload: false });
     };
   }, []);
 

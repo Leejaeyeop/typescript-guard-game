@@ -8,23 +8,21 @@ const bgMap = {
 } as const;
 
 export function RoundAnswerResult() {
-  const { setIsVisibleRoundResult, updatePendingAnimationsCount, roundResult } =
-    useRoundManager();
+  const { roundState, roundStateDispatch } = useRoundManager();
 
   return (
     <div
       className="absolute w-full h-full z-[5] top-0 flex justify-center items-center"
       onAnimationEnd={() => {
-        updatePendingAnimationsCount("decrement");
-        setIsVisibleRoundResult(false);
+        roundStateDispatch({ type: "ANIMATION_FINISHED" });
       }}
     >
       <div
-        className={`${bgMap[roundResult]} animate-fade-in-out w-full h-full opacity-0 absolute`}
+        className={`${bgMap[roundState.roundResult]} animate-fade-in-out w-full h-full opacity-0 absolute`}
       ></div>
       <div className="w-1/2 h-1/6 relative">
         <Image
-          className={`${roundResult !== "RIGHT" && "hidden"}`}
+          className={`${roundState.roundResult !== "RIGHT" && "hidden"}`}
           src="/assets/ui/right_text.webp"
           alt="result_text"
           fill
@@ -32,7 +30,7 @@ export function RoundAnswerResult() {
           priority={true}
         />
         <Image
-          className={`${roundResult !== "WRONG" && "hidden"}`}
+          className={`${roundState.roundResult !== "WRONG" && "hidden"}`}
           src="/assets/ui/wrong_text.webp"
           alt="wrong_text"
           fill

@@ -14,8 +14,7 @@ export default function HTMLOverlay() {
   const { activeScene } = useAppStore();
   const { stageState, currentQuiz } = useStageManager();
 
-  const { isVisibleAnswer, isVisibleActionBar, isVisibleRoundResult } =
-    useRoundManager();
+  const { roundState } = useRoundManager();
 
   const [isMenuOpen, menuOverlay, showQuizReview] = useMenuStore(
     useShallow((state) => [
@@ -31,11 +30,11 @@ export default function HTMLOverlay() {
       {/* top HUD */}
       {stageState.isVisibleTopHUD && <TopHUD />}
       {/* question */}
-      <ResizableContainer hidden={!isVisibleAnswer}>
+      <ResizableContainer hidden={!roundState.isVisibleAnswer}>
         <MonacoEditor value={currentQuiz?.question} />
       </ResizableContainer>
       {/* action bar */}
-      {isVisibleActionBar && <ActionBar />}
+      {roundState.isVisibleActionBar && <ActionBar />}
       {/* menu */}
       {isMenuOpen && menuOverlay}
       {/* pause */}
@@ -45,7 +44,7 @@ export default function HTMLOverlay() {
       {/* answer result */}
       {activeScene === SCENE_IDS.QUIZ_STAGE && (
         <div
-          className={`${!isVisibleRoundResult && "hidden"} absolute top-0 w-full h-full`}
+          className={`${!roundState.isVisibleRoundResult && "hidden"} absolute top-0 w-full h-full`}
         >
           <RoundAnswerResult />
         </div>

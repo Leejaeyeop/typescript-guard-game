@@ -18,8 +18,7 @@ export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
   const spriteRef = useRef(null);
   const [texture, setTexture] = useState(Texture.EMPTY);
   const [positionY, setPositionY] = useState(MAX_SIZE);
-  const { updatePendingAnimationsCount, setIsVisibleVisitor } =
-    useRoundManager();
+  const { roundStateDispatch } = useRoundManager();
   const status = useRef<"appear" | "disappear" | "idle">("appear");
 
   // Preload the sprite if it hasn't been loaded yet
@@ -39,15 +38,14 @@ export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
         setPositionY((prev) => prev - 4);
       } else {
         status.current = "idle";
-        updatePendingAnimationsCount("decrement");
+        roundStateDispatch({ type: "ANIMATION_FINISHED" });
       }
     } else if (status.current === "disappear") {
       if (positionY < MAX_SIZE + 200) {
         setPositionY((prev) => prev + 4);
       } else {
         status.current = "idle";
-        setIsVisibleVisitor(false);
-        updatePendingAnimationsCount("decrement");
+        roundStateDispatch({ type: "ANIMATION_FINISHED" });
       }
     }
   });

@@ -2,7 +2,6 @@
 
 import {
   useRef,
-  useState,
   createContext,
   ReactNode,
   Ref,
@@ -11,11 +10,13 @@ import {
   useEffect,
   useMemo,
   Dispatch,
-  SetStateAction,
+  useReducer,
 } from "react";
 import { useStageManager } from "./use-stage-manager";
 import { BackgroundSpriteHandle } from "@/components/canvas/sprites/BackgroundSprite";
 import { VisitorSpriteHandle } from "@/components/canvas/sprites/VisitorSprite";
+
+// --- 타입 및 상수 정의 ---
 
 const ROUND_RESULT = {
   NONE: "NONE",
@@ -23,40 +24,59 @@ const ROUND_RESULT = {
   WRONG: "WRONG",
 } as const;
 
-export type RoundResult = (typeof ROUND_RESULT)[keyof typeof ROUND_RESULT];
+type RoundResult = (typeof ROUND_RESULT)[keyof typeof ROUND_RESULT];
 
-type RoundContextType = {
-  curRoundPhase: (typeof roundPhase)[number];
-  backgroundRef: RefObject<BackgroundSpriteHandle | null>;
-  setRoundPhaseIdx: Dispatch<SetStateAction<number>>;
-  visitorRef: Ref<VisitorSpriteHandle | null>;
-  isVisibleVisitor: boolean;
-  isVisibleAnswer: boolean;
-  isVisibleActionBar: boolean;
-  setIsVisibleVisitor: Dispatch<SetStateAction<boolean>>;
-  submitAnswer: (answer: boolean) => void;
-  setCorrectAnswer: (answer: boolean) => void;
-  updatePendingAnimationsCount: (action: "increment" | "decrement") => void;
-  isVisibleRoundResult: boolean;
-  setIsVisibleRoundResult: Dispatch<SetStateAction<boolean>>;
-  roundResult: RoundResult;
-};
-
-const RoundContext = createContext<RoundContextType | undefined>(undefined);
-
-const roundPhase = [
+type ROUND_PHASES = [
   "NONE",
   "ROUND_START",
   "PRESENTING_QUESTION",
   "ANSWER_SUBMITTED",
-  "SHOW_RESULT",
+  "SHOWING_RESULT",
   "ROUND_ENDED",
-] as const;
+];
 
-const initialRoundState = {
-  roundPhaseIdx: 0,
-  userAnswer: null as boolean | null,
-  correctAnswer: null as boolean | null,
+type RoundPhase = ROUND_PHASES[number];
+
+type RoundState = {
+  phase: RoundPhase;
+  userAnswer: boolean | null;
+  correctAnswer: boolean | null;
+  isVisibleAnswer: boolean;
+  isVisibleActionBar: boolean;
+  isVisibleVisitor: boolean;
+  pendingAnimationsCount: number;
+  isVisibleRoundResult: boolean;
+  roundResult: RoundResult;
+};
+
+type RoundContextType = {
+  roundState: RoundState;
+  roundStateDispatch: Dispatch<Action>;
+  backgroundRef: RefObject<BackgroundSpriteHandle | null>;
+  visitorRef: Ref<VisitorSpriteHandle | null>;
+  submitAnswer: (answer: boolean) => void;
+  setCorrectAnswer: (answer: boolean) => void;
+};
+
+const RoundContext = createContext<RoundContextType | undefined>(undefined);
+
+// --- Reducer 및 Action 정의 ---
+
+type Action =
+  | { type: "RESET_ROUND" }
+  | { type: "START_ROUND" }
+  | { type: "PRESENT_QUESTION" }
+  | { type: "SET_CORRECT_ANSWER"; payload: boolean }
+  | { type: "SUBMIT_ANSWER"; payload: boolean }
+  | { type: "SHOW_RESULT" }
+  | { type: "END_ROUND" }
+  | { type: "ANIMATION_STARTED" }
+  | { type: "ANIMATION_FINISHED" };
+
+const initialState: RoundState = {
+  phase: "NONE",
+  userAnswer: null,
+  correctAnswer: null,
   isVisibleAnswer: false,
   isVisibleActionBar: false,
   isVisibleVisitor: false,
@@ -65,177 +85,157 @@ const initialRoundState = {
   roundResult: ROUND_RESULT.NONE,
 };
 
+function getNextPhaseAfterAnimation(phase: RoundPhase): RoundPhase {
+  switch (phase) {
+    case "ROUND_START":
+      return "PRESENTING_QUESTION";
+    case "ANSWER_SUBMITTED":
+      return "SHOWING_RESULT";
+    case "SHOWING_RESULT":
+      return "ROUND_ENDED";
+    default:
+      return phase;
+  }
+}
+
+function roundReducer(state: RoundState, action: Action): RoundState {
+  switch (action.type) {
+    case "RESET_ROUND":
+      return { ...initialState };
+    case "START_ROUND":
+      return { ...state, phase: "ROUND_START", isVisibleVisitor: true };
+    case "PRESENT_QUESTION":
+      return {
+        ...state,
+        phase: "PRESENTING_QUESTION",
+        isVisibleAnswer: true,
+        isVisibleActionBar: true,
+      };
+    case "SET_CORRECT_ANSWER":
+      return { ...state, correctAnswer: action.payload };
+    case "SUBMIT_ANSWER":
+      return {
+        ...state,
+        phase: "ANSWER_SUBMITTED",
+        userAnswer: action.payload,
+        isVisibleAnswer: false,
+        isVisibleActionBar: false,
+      };
+    case "SHOW_RESULT": {
+      const isCorrect = state.correctAnswer === state.userAnswer;
+      return {
+        ...state,
+        // phase: "SHOWING_RESULT",
+        roundResult: isCorrect ? ROUND_RESULT.RIGHT : ROUND_RESULT.WRONG,
+        isVisibleVisitor: false,
+        isVisibleRoundResult: true,
+      };
+    }
+    case "END_ROUND":
+      return { ...state, phase: "ROUND_ENDED", isVisibleRoundResult: false };
+    case "ANIMATION_STARTED":
+      return {
+        ...state,
+        pendingAnimationsCount: state.pendingAnimationsCount + 1,
+      };
+    case "ANIMATION_FINISHED": {
+      const newCount = state.pendingAnimationsCount - 1;
+      if (newCount === 0) {
+        // 모든 애니메이션이 끝나면 다음 단계로 전환
+        return {
+          ...state,
+          pendingAnimationsCount: 0,
+          phase: getNextPhaseAfterAnimation(state.phase),
+        };
+      }
+      return { ...state, pendingAnimationsCount: newCount };
+    }
+    default:
+      return state;
+  }
+}
+
+// --- Provider 컴포넌트 ---
+
 export const RoundProvider = ({ children }: { children: ReactNode }) => {
   const { stageState, reportRoundOutcome } = useStageManager();
-  // 현재 round 페이즈
-  const [roundPhaseIdx, setRoundPhaseIdx] = useState(
-    initialRoundState.roundPhaseIdx
-  );
-
-  const [isVisibleAnswer, setIsVisibleAnswer] = useState(
-    initialRoundState.isVisibleAnswer
-  );
-  const [isVisibleActionBar, setIsVisibleActionBar] = useState(
-    initialRoundState.isVisibleActionBar
-  );
-  // 사용자 응답 값
-  const [userAnswer, setUserAnswer] = useState(initialRoundState.userAnswer);
-  // 정답 값
-  const [correctAnswer, setCorrectAnswer] = useState(
-    initialRoundState.correctAnswer
-  );
-  // visitor
-  const [isVisibleVisitor, setIsVisibleVisitor] = useState(
-    initialRoundState.isVisibleVisitor
-  );
-  // result - right
-  const [isVisibleRoundResult, setIsVisibleRoundResult] = useState(
-    initialRoundState.isVisibleRoundResult
-  );
-  const [roundResult, setRoundResult] = useState<RoundResult>(
-    initialRoundState.roundResult
-  );
-
-  // 에니메이션 대기 카운트
-  const [, setPendingAnimationsCount] = useState(
-    initialRoundState.pendingAnimationsCount
+  const [roundState, roundStateDispatch] = useReducer(
+    roundReducer,
+    initialState
   );
 
   const backgroundRef = useRef<BackgroundSpriteHandle>(null);
   const visitorRef = useRef<VisitorSpriteHandle>(null);
 
-  const updatePendingAnimationsCount = (
-    action: "increment" | "decrement" | "reset"
-  ) => {
-    setPendingAnimationsCount((prev) => {
-      const next = action === "increment" ? prev + 1 : Math.max(prev - 1, 0);
+  // 컴포넌트에서 사용하기 편하도록 dispatch를 래핑한 함수들
+  const submitAnswer = (answer: boolean) =>
+    roundStateDispatch({ type: "SUBMIT_ANSWER", payload: answer });
+  const setCorrectAnswer = (answer: boolean) =>
+    roundStateDispatch({ type: "SET_CORRECT_ANSWER", payload: answer });
 
-      // "🎉 모든 애니메이션 완료"
-      if (prev > 0 && next === 0) {
-        // 👉 여기에 후처리 로직 삽입 (예: 상태 변경, 이벤트 호출 등)
-        setRoundPhaseIdx(roundPhaseIdx + 1);
-      }
-
-      return next;
-    });
-  };
-
-  // reset 로직
-  const resetStates = () => {
-    setUserAnswer(initialRoundState.userAnswer);
-    setCorrectAnswer(initialRoundState.correctAnswer);
-    setIsVisibleAnswer(initialRoundState.isVisibleAnswer);
-    setIsVisibleActionBar(initialRoundState.isVisibleActionBar);
-    setIsVisibleVisitor(initialRoundState.isVisibleVisitor);
-    setPendingAnimationsCount(initialRoundState.pendingAnimationsCount);
-    setIsVisibleRoundResult(initialRoundState.isVisibleRoundResult);
-    setRoundResult(initialRoundState.roundResult);
-  };
-
-  const curRoundPhase = useMemo(() => {
-    return roundPhase[roundPhaseIdx];
-  }, [roundPhaseIdx]);
-
-  const submitAnswer = (answer: boolean) => {
-    setUserAnswer(answer);
-    setRoundPhaseIdx(roundPhaseIdx + 1);
-  };
-
-  // state의 phase 를 구독한다
+  // 상위 컨텍스트(Stage)의 상태를 구독하여 라운드 상태 제어
   useEffect(() => {
-    // 리셋 하기
-    if (stageState.phase === "NONE" || stageState.phase === "PREPARE") {
-      setRoundPhaseIdx(0);
-    } else if (stageState.phase === "ROUNDS_IN_PROGRESS") {
-      // 라운드 시작
-      setRoundPhaseIdx(1);
+    if (stageState.phase === "ROUNDS_IN_PROGRESS") {
+      roundStateDispatch({ type: "START_ROUND" });
+    } else if (stageState.phase === "NONE" || stageState.phase === "PREPARE") {
+      roundStateDispatch({ type: "RESET_ROUND" });
     }
   }, [stageState.phase, stageState.currentRoundIndex]);
 
+  // Reducer의 상태 변화에 따른 Side Effect (애니메이션 등) 처리
   useEffect(() => {
-    // 에니메이션 실행 함수
-    const startAnimation = (func: (...args: unknown[]) => unknown) => {
-      updatePendingAnimationsCount("increment");
-      func();
-    };
-
-    const isCorrect = (userAnswer: boolean) => {
-      return correctAnswer === userAnswer;
-    };
-
-    switch (curRoundPhase) {
-      case "NONE": {
-        resetStates();
+    switch (roundState.phase) {
+      case "ROUND_START":
+        backgroundRef.current?.playIdleAnimation();
+        roundStateDispatch({ type: "ANIMATION_STARTED" }); // visitor 등장 애니메이션 시작
+        visitorRef.current?.setStatus("appear");
         break;
-      }
 
-      case "ROUND_START": {
-        backgroundRef.current!.playIdleAnimation();
-        startAnimation(() => setIsVisibleVisitor(true));
+      case "PRESENTING_QUESTION":
+        roundStateDispatch({ type: "PRESENT_QUESTION" }); // visitor 퇴장 애니메이션 시작
         break;
-      }
 
-      case "PRESENTING_QUESTION": {
-        setIsVisibleAnswer(true);
-        setIsVisibleActionBar(true);
-        break;
-      }
+      case "ANSWER_SUBMITTED":
+        roundStateDispatch({ type: "ANIMATION_STARTED" }); // visitor 퇴장 애니메이션 시작
+        visitorRef.current?.setStatus("disappear");
 
-      case "ANSWER_SUBMITTED": {
-        startAnimation(() => visitorRef.current?.setStatus("disappear"));
-        setIsVisibleAnswer(false);
-        setIsVisibleActionBar(false);
-
-        if (!userAnswer) {
-          startAnimation(() => backgroundRef?.current?.playGuardAnimation());
+        if (roundState.userAnswer === false) {
+          roundStateDispatch({ type: "ANIMATION_STARTED" }); // 경비원 애니메이션 시작
+          backgroundRef.current?.playGuardAnimation();
         }
         break;
-      }
 
-      case "SHOW_RESULT": {
-        if (isCorrect(userAnswer!)) {
-          setRoundResult(ROUND_RESULT.RIGHT);
-        } else {
-          setRoundResult(ROUND_RESULT.WRONG);
-        }
-
-        startAnimation(() => setIsVisibleRoundResult(true));
-
+      case "SHOWING_RESULT":
+        // 여기서는 결과 표시 애니메이션을 시작할 수 있음 (예: 1초 뒤에 다음 페이즈로)
+        roundStateDispatch({ type: "ANIMATION_STARTED" });
+        roundStateDispatch({ type: "SHOW_RESULT" });
         break;
-      }
 
-      case "ROUND_ENDED": {
+      case "ROUND_ENDED":
+        roundStateDispatch({ type: "END_ROUND" });
+
         reportRoundOutcome({
-          isCorrect: isCorrect(userAnswer!),
-          userAnswer: userAnswer!,
+          isCorrect: roundState.roundResult === ROUND_RESULT.RIGHT,
+          userAnswer: roundState.userAnswer!,
         });
         break;
-      }
-
-      default:
-        break;
     }
-  }, [curRoundPhase]);
+  }, [roundState.phase]);
+
+  const contextValue = useMemo(
+    () => ({
+      roundState,
+      roundStateDispatch,
+      backgroundRef,
+      visitorRef,
+      submitAnswer,
+      setCorrectAnswer,
+    }),
+    [roundState] // state 객체가 바뀔 때만 value가 새로 생성됨
+  );
 
   return (
-    <RoundContext.Provider
-      value={{
-        setRoundPhaseIdx,
-        curRoundPhase,
-        backgroundRef,
-        visitorRef,
-        isVisibleVisitor,
-        isVisibleAnswer,
-        isVisibleActionBar,
-        setIsVisibleVisitor,
-        updatePendingAnimationsCount,
-        submitAnswer,
-        setCorrectAnswer,
-        isVisibleRoundResult,
-        setIsVisibleRoundResult,
-        roundResult,
-      }}
-    >
+    <RoundContext.Provider value={contextValue}>
       {children}
     </RoundContext.Provider>
   );
@@ -244,7 +244,7 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
 export function useRoundManager() {
   const context = useContext(RoundContext);
   if (!context) {
-    throw new Error("useRoundManager must be used within a CounterProvider");
+    throw new Error("useRoundManager must be used within a RoundProvider");
   }
   return context;
 }
