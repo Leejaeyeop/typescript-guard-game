@@ -2,6 +2,8 @@
 
 import { ActionButton } from "@/components/ui/button/ActionButton";
 import { useRoundManager } from "@/contexts/RoundProvider";
+import passButton from "@/assets/ui/button/pass_button.webp";
+import guardButton from "@/assets/ui/button/guard_button.webp";
 
 export function ActionBar() {
   const { roundState, submitAnswer } = useRoundManager();
@@ -21,13 +23,13 @@ export function ActionBar() {
         </h2>
         <ActionButton
           label="pass"
-          imageSrc="/assets/ui/pass_button.webp"
+          imageSrc={passButton}
           onClick={() => submitAnswer(true)}
           disabled={isActionDisabled}
         />
         <ActionButton
           label="guard"
-          imageSrc="/assets/ui/guard_button.webp"
+          imageSrc={guardButton}
           onClick={() => submitAnswer(false)}
           disabled={isActionDisabled}
         />

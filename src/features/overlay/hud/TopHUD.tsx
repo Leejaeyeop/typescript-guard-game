@@ -54,7 +54,7 @@ export function TopHUD() {
       <button
         type="button"
         aria-label="open pause menu" // 버튼의 명확한 동작 설명
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent border-none transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-opacity-75"
+        className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent border-none opacity-80 transition-opacity hover:opacity-100 hover:cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-opacity-75"
         onClick={handleOpenPauseMenu}
       >
         <Image

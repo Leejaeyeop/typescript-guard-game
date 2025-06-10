@@ -1,5 +1,5 @@
-import IconCheck from "@/assets/IconCheck.svg?react";
-import IconX from "@/assets/IconX.svg?react";
+import IconCheck from "@/assets/icons/IconCheck.svg?react";
+import IconX from "@/assets/icons/IconX.svg?react";
 
 interface ResultIndicatorProps {
   wasCorrect: boolean;

@@ -21,22 +21,22 @@ import {
 const ANIMATION_SPEED = 0.15;
 
 const spritesPath = {
-  idle1: "assets/background/idle/idle1.jpeg",
-  idle2: "assets/background/idle/idle2.jpeg",
-  idle3: "assets/background/idle/idle3.jpeg",
-  idle4: "assets/background/idle/idle4.jpeg",
-  idle5: "assets/background/idle/idle5.jpeg",
-  guard1: "assets/background/guard/guard1.jpeg",
-  guard2: "assets/background/guard/guard2.jpeg",
-  guard3: "assets/background/guard/guard3.jpeg",
-  guard4: "assets/background/guard/guard4.jpeg",
-  guard5: "assets/background/guard/guard5.jpeg",
-  guard6: "assets/background/guard/guard6.jpeg",
-  guard7: "assets/background/guard/guard7.jpeg",
-  guardIdle1: "assets/background/guard_idle/guard_idle1.jpeg",
-  guardIdle2: "assets/background/guard_idle/guard_idle2.jpeg",
-  guardIdle3: "assets/background/guard_idle/guard_idle3.jpeg",
-  guardIdle4: "assets/background/guard_idle/guard_idle4.jpeg",
+  idle1: "assets/sprites/background/idle/idle1.jpeg",
+  idle2: "assets/sprites/background/idle/idle2.jpeg",
+  idle3: "assets/sprites/background/idle/idle3.jpeg",
+  idle4: "assets/sprites/background/idle/idle4.jpeg",
+  idle5: "assets/sprites/background/idle/idle5.jpeg",
+  guard1: "assets/sprites/background/guard/guard1.jpeg",
+  guard2: "assets/sprites/background/guard/guard2.jpeg",
+  guard3: "assets/sprites/background/guard/guard3.jpeg",
+  guard4: "assets/sprites/background/guard/guard4.jpeg",
+  guard5: "assets/sprites/background/guard/guard5.jpeg",
+  guard6: "assets/sprites/background/guard/guard6.jpeg",
+  guard7: "assets/sprites/background/guard/guard7.jpeg",
+  guardIdle1: "assets/sprites/background/guard_idle/guard_idle1.jpeg",
+  guardIdle2: "assets/sprites/background/guard_idle/guard_idle2.jpeg",
+  guardIdle3: "assets/sprites/background/guard_idle/guard_idle3.jpeg",
+  guardIdle4: "assets/sprites/background/guard_idle/guard_idle4.jpeg",
 } as const;
 
 export type BackgroundSpriteHandle = {

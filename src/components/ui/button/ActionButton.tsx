@@ -1,8 +1,8 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 
 interface ActionButtonProps {
   label: string; // 스크린 리더가 읽을 명확한 레이블
-  imageSrc: string;
+  imageSrc: string | StaticImageData;
   onClick: () => void;
   disabled: boolean;
 }

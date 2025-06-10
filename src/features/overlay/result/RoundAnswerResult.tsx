@@ -1,6 +1,9 @@
 import { useRoundManager } from "@/contexts/RoundProvider";
 import Image from "next/image";
 
+import rightText from "@/assets/ui/text/right_text.webp";
+import wrongText from "@/assets/ui/text/wrong_text.webp";
+
 const bgMap = {
   NONE: "",
   RIGHT: "bg-green-700",
@@ -23,7 +26,7 @@ export function RoundAnswerResult() {
       <div className="w-1/2 h-1/6 relative">
         <Image
           className={`${roundState.roundResult !== "RIGHT" && "hidden"}`}
-          src="/assets/ui/right_text.webp"
+          src={rightText}
           alt="result_text"
           fill
           loading="eager"
@@ -31,7 +34,7 @@ export function RoundAnswerResult() {
         />
         <Image
           className={`${roundState.roundResult !== "WRONG" && "hidden"}`}
-          src="/assets/ui/wrong_text.webp"
+          src={wrongText}
           alt="wrong_text"
           fill
           loading="eager"

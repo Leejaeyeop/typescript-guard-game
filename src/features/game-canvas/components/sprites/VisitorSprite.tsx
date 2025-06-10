@@ -31,11 +31,11 @@ export function VisitorSprite({ ref }: VisitorSpriteProps) {
   // Preload the sprite if it hasn't been loaded yet
   useEffect(() => {
     if (texture === Texture.EMPTY) {
-      Assets.load(`assets/visitors/visitor${getRandomNumber()}.webp`).then(
-        (result) => {
-          setTexture(result);
-        }
-      );
+      Assets.load(
+        `assets/sprites/visitors/visitor${getRandomNumber()}.webp`
+      ).then((result) => {
+        setTexture(result);
+      });
     }
   }, [texture]);
 
