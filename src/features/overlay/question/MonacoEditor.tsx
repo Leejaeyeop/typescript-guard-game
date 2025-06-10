@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import Editor, { BeforeMount, OnMount } from "@monaco-editor/react";
-import { useRoundManager } from "@/app/(pixijs)/hooks/use-round-manager";
+import { useRoundManager } from "@/contexts/RoundProvider";
 
 import * as monacoEditor from "monaco-editor";
 

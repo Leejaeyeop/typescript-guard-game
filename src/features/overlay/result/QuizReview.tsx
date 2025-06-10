@@ -2,7 +2,7 @@ import { useMenuStore } from "@/store/useMenuStore";
 import { Quiz } from "@/types/quiz";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { useStageManager } from "@/app/(pixijs)/hooks/use-stage-manager";
+import { useStageManager } from "@/contexts/StageProvider";
 
 interface QuizReviewCardProps {
   quiz: Quiz;

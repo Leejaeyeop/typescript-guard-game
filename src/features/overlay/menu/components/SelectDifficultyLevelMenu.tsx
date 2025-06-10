@@ -1,8 +1,8 @@
-import { useStageManager } from "@/app/(pixijs)/hooks/use-stage-manager";
-import { MenuButton } from "../button/MenuButton";
+import { useStageManager } from "@/contexts/StageProvider";
 import { DifficultyLevel } from "@/types/difficultyLevel";
 import { useMenuStore } from "@/store/useMenuStore";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
+import { MenuButton } from "@/components/ui/button/MenuButton";
 
 export function SelectDifficultyLevel() {
   const { setStageDifficulty, initStage } = useStageManager();

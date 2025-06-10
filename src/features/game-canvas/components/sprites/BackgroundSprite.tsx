@@ -1,6 +1,6 @@
 "use client";
-import { MAX_SIZE } from "@/app/(pixijs)/constants/sizes";
-import { useRoundManager } from "@/app/(pixijs)/hooks/use-round-manager";
+import { MAX_SIZE } from "@/constants/sizes";
+import { useRoundManager } from "@/contexts/RoundProvider";
 import {
   AnimatedSprite,
   AnimatedSpriteFrames,

@@ -1,4 +1,4 @@
-import { useRoundManager } from "@/app/(pixijs)/hooks/use-round-manager";
+import { useRoundManager } from "@/contexts/RoundProvider";
 import Image from "next/image";
 
 const bgMap = {

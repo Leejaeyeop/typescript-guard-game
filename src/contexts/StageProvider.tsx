@@ -13,9 +13,9 @@ import {
 import { Quiz } from "@/types/quiz";
 import { DifficultyLevel } from "@/types/difficultyLevel";
 import { useMenuStore } from "@/store/useMenuStore";
-import { StageResultMenu } from "@/components/overlay/menu/StageResultMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import { getRandomQuizzesByDifficulty } from "@/utils/quizUtils";
+import { StageResultMenu } from "@/features/overlay/menu/components/StageResultMenu";
 
 // --- Types and Constants ---
 type STAGE_PHASES = [

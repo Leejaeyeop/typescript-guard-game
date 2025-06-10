@@ -1,8 +1,8 @@
 import { useMenuStore } from "@/store/useMenuStore";
-import { MenuOverlay } from "./MenuOverlay";
-import { MenuButton } from "../button/MenuButton";
+import { MenuOverlay } from "../MenuOverlay";
 import { MainMenu } from "./MainMenu";
 import { useAppStore } from "@/store/useAppStore";
+import { MenuButton } from "@/components/ui/button/MenuButton";
 
 function GuideMenuContent() {
   const { setMenuOverlay } = useMenuStore();

@@ -1,14 +1,14 @@
-import { useRoundManager } from "@/app/(pixijs)/hooks/use-round-manager";
-import { useStageManager } from "@/app/(pixijs)/hooks/use-stage-manager";
-import MonacoEditor from "@/components/overlay/question/MonacoEditor";
-import { ActionBar } from "@/components/overlay/actionBar/ActionBar";
-import { TopHUD } from "@/components/overlay/hud/TopHUD";
-import { RoundAnswerResult } from "@/components/overlay/result/RoundAnswerResult";
+import { useRoundManager } from "@/contexts/RoundProvider";
+import { useStageManager } from "@/contexts/StageProvider";
+import MonacoEditor from "@/features/overlay/question/MonacoEditor";
+import { ActionBar } from "@/features/overlay/action-bar/ActionBar";
+import { RoundAnswerResult } from "@/features/overlay/result/RoundAnswerResult";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import { useMenuStore } from "@/store/useMenuStore";
 import { useShallow } from "zustand/shallow";
 import ResizableContainer from "./question/ResizableContainer";
 import QuizReviewPage from "./result/QuizReview";
+import { TopHUD } from "./hud/TopHUD";
 
 export default function HTMLOverlay() {
   const { activeScene } = useAppStore();

@@ -1,9 +1,9 @@
-import { MenuOverlay } from "./MenuOverlay";
-import { MenuButton } from "../button/MenuButton";
+import { MenuOverlay } from "../MenuOverlay";
 import { useMenuStore } from "@/store/useMenuStore";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
-import { useStageManager } from "@/app/(pixijs)/hooks/use-stage-manager";
+import { useStageManager } from "@/contexts/StageProvider";
 import { useEffect } from "react";
+import { MenuButton } from "@/components/ui/button/MenuButton";
 
 function PauseMenuContent() {
   const { closeMenu } = useMenuStore();

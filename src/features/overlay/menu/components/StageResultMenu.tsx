@@ -1,5 +1,5 @@
-import { MenuOverlay, useMenuOverlay } from "./MenuOverlay";
-import { MenuButton } from "../button/MenuButton";
+import { MenuButton } from "@/components/ui/button/MenuButton";
+import { MenuOverlay, useMenuOverlay } from "../MenuOverlay";
 import { SelectDifficultyLevel } from "./SelectDifficultyLevelMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import { useMenuStore } from "@/store/useMenuStore";

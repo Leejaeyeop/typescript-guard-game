@@ -1,9 +1,9 @@
 "use client";
 
-import { MenuOverlay, useMenuOverlay } from "./MenuOverlay";
-import { MenuButton } from "../button/MenuButton";
+import { MenuOverlay, useMenuOverlay } from "../MenuOverlay";
 import { SelectDifficultyLevel } from "./SelectDifficultyLevelMenu";
 import CreditMenu from "./CreditMenu";
+import { MenuButton } from "@/components/ui/button/MenuButton";
 
 function MainMenuContent() {
   const { pushMenuContext } = useMenuOverlay();

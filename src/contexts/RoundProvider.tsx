@@ -12,9 +12,9 @@ import {
   Dispatch,
   useReducer,
 } from "react";
-import { useStageManager } from "./use-stage-manager";
-import { BackgroundSpriteHandle } from "@/components/canvas/sprites/BackgroundSprite";
-import { VisitorSpriteHandle } from "@/components/canvas/sprites/VisitorSprite";
+import { useStageManager } from "./StageProvider";
+import { BackgroundSpriteHandle } from "@/features/game-canvas/components/sprites/BackgroundSprite";
+import { VisitorSpriteHandle } from "@/features/game-canvas/components/sprites/VisitorSprite";
 
 // --- 타입 및 상수 정의 ---
 

@@ -1,8 +1,8 @@
 import { useMenuStore } from "@/store/useMenuStore";
 import { useShallow } from "zustand/shallow";
-import { PauseMenu } from "../menu/PauseMenu";
-import { useStageManager } from "@/app/(pixijs)/hooks/use-stage-manager";
+import { useStageManager } from "@/contexts/StageProvider";
 import Image from "next/image";
+import { PauseMenu } from "../menu/components/PauseMenu";
 
 export function TopHUD() {
   const [setMenuOverlay, openMenu] = useMenuStore(

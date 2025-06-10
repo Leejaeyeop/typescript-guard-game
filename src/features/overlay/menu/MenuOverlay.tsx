@@ -1,5 +1,5 @@
+import { MenuButton } from "@/components/ui/button/MenuButton";
 import { createContext, ReactNode, useContext, useState } from "react";
-import { MenuButton } from "../button/MenuButton";
 
 type MenuOverlayContextType = {
   pushMenuContext: (context: ReactNode) => void;
