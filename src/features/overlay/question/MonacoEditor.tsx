@@ -25,6 +25,9 @@ const EDITOR_OPTIONS: monacoEditor.editor.IStandaloneEditorConstructionOptions =
     glyphMargin: false,
     folding: false,
     lineNumbersMinChars: 2,
+    hover: {
+      enabled: false, // 👈 hover 비활성화
+    },
   };
 
 export default function MonacoEditor({
