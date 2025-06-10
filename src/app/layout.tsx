@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import { MedievalSharp } from "next/font/google";
 import "./globals.css";
 
+const metadataBase = new URL(
+  process.env.NEXT_PUBLIC_METADATA_BASE_URL || "http://localhost:3000"
+);
+
 export const metadata: Metadata = {
-  // metadataBase: new URL("[https://your-app-url.com]"),
+  metadataBase: metadataBase,
 
   title: {
     template: "Typescript Guard",
@@ -52,7 +56,7 @@ export const metadata: Metadata = {
         alt: "Type Guard Game Logo",
       },
     ],
-    url: "[https://your-app-url.com]",
+    url: process.env.NEXT_PUBLIC_METADATA_BASE_URL,
     siteName: "Type Guard",
     type: "website",
   },

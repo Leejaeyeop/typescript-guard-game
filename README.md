@@ -11,6 +11,7 @@
 
 ## ⚔️ Introduction
 
+https://www.typescriptquiz.com/
 ![Type Guard Gameplay](./public/og-image.png)
 
 ## ⚔️ Introduction
@@ -58,6 +59,8 @@ bun install
 ```bash
 npx convex dev
 # or
+pnpm exec convex dev
+# or
 bunx convex dev
 ```
 
@@ -81,6 +84,10 @@ REVALIDATION_SECRET="[Your-strong-secret-token]"
 ```bash
 # 'quizzes' should be replaced with the actual table name defined in your Convex schema.
 npx convex import quizzes data/questions.jsonl
+# or
+pnpm exec convex import quizzes data/questions.jsonl
+# or
+bunx convex import quizzes data/questions.jsonl
 ```
 
 5. Run the Next.js Development Server
