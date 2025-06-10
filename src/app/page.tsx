@@ -1,8 +1,8 @@
-import App from "./(pixijs)/App";
-import { MAX_SIZE } from "./(pixijs)/constants/sizes";
+import { MAX_SIZE } from "../constants/sizes";
 import { api } from "../../convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import { Quiz } from "@/types/quiz";
+import GameView from "@/features/game-view/GameView";
 
 export default async function Home() {
   let quizzes: Quiz[] = [];
@@ -22,7 +22,7 @@ export default async function Home() {
           maxHeight: MAX_SIZE + "px",
         }}
       >
-        <App totalQuizzes={quizzes} />
+        <GameView totalQuizzes={quizzes} />
       </div>
     </main>
   );

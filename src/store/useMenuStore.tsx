@@ -1,4 +1,4 @@
-import { MainMenu } from "@/components/overlay/menu/MainMenu";
+import { MainMenu } from "@/features/overlay/menu/components/MainMenu";
 import { ReactNode } from "react";
 import { create } from "zustand";
 
