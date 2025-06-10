@@ -17,7 +17,7 @@ export function ActionBar() {
       >
         {/* 스크린 리더 사용자에게 그룹의 목적을 알려주는 숨은 제목 */}
         <h2 id="action-bar-heading" className="sr-only">
-          액션 선택
+          select action
         </h2>
         <ActionButton
           label="pass"
