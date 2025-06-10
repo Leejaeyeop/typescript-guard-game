@@ -9,6 +9,23 @@ interface MonacoEditorProps {
   value: string | null;
 }
 
+// Monaco 에디터 자체의 옵션
+const EDITOR_OPTIONS: monacoEditor.editor.IStandaloneEditorConstructionOptions =
+  {
+    readOnly: true,
+    minimap: { enabled: false },
+    contextmenu: false,
+    wordWrap: "on",
+    cursorStyle: "line",
+    mouseStyle: "default",
+    selectionHighlight: false,
+    selectionClipboard: false,
+    dragAndDrop: false,
+    glyphMargin: false,
+    folding: false,
+    lineNumbersMinChars: 2,
+  };
+
 export default function MonacoEditor({ value }: MonacoEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(
@@ -69,7 +86,15 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
   }, [value, setCorrectAnswer]);
 
   return (
-    <div ref={containerRef} className="h-full w-full">
+    <figure
+      ref={containerRef}
+      className="h-full w-full"
+      role="group"
+      aria-labelledby="editor-caption"
+    >
+      <figcaption id="editor-caption" className="sr-only">
+        Typescript Question Code
+      </figcaption>
       <Editor
         height="100%"
         width="100%"
@@ -77,25 +102,8 @@ export default function MonacoEditor({ value }: MonacoEditorProps) {
         beforeMount={handleEditorBeforeMount}
         onMount={handleEditorMount}
         theme="vs-dark"
-        options={{
-          readOnly: true,
-          minimap: { enabled: false },
-          contextmenu: false, // 우클릭 메뉴 비활성화
-          // width 값을 고정시킨다.
-          wordWrap: "on",
-          cursorStyle: "line",
-          mouseStyle: "default", // 커서 모양 단순화
-          selectionHighlight: false,
-          selectionClipboard: false,
-          dragAndDrop: false, // ⛔ 드래그 금지
-
-          // lineNumbers: 'off',
-          glyphMargin: false,
-          folding: false,
-          // lineDecorationsWidth: 0,
-          lineNumbersMinChars: 2,
-        }}
+        options={EDITOR_OPTIONS}
       />
-    </div>
+    </figure>
   );
 }

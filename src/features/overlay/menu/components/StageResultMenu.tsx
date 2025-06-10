@@ -34,13 +34,21 @@ function StageResultMenuContent({
           </div>
         </>
       )}
-      <MenuButton className="mb-5" onClick={() => setShowQuizReview(true)}>
+      <MenuButton
+        aria-label="View Results"
+        className="mb-5"
+        onClick={() => setShowQuizReview(true)}
+      >
         View Results
       </MenuButton>
-      <MenuButton onClick={() => pushMenuContext(<SelectDifficultyLevel />)}>
+      <MenuButton
+        aria-label="Play other game"
+        onClick={() => pushMenuContext(<SelectDifficultyLevel />)}
+      >
         Play other game
       </MenuButton>
       <MenuButton
+        aria-label=" Back to main"
         onClick={() => {
           setActiveScene(SCENE_IDS.MAIN);
         }}

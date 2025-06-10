@@ -7,7 +7,7 @@ import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import { useMenuStore } from "@/store/useMenuStore";
 import { useShallow } from "zustand/shallow";
 import ResizableContainer from "./question/ResizableContainer";
-import QuizReviewPage from "./result/QuizReview";
+import QuizReviewPage from "./result/QuizReviewPage";
 import { TopHUD } from "./hud/TopHUD";
 
 export default function HTMLOverlay() {

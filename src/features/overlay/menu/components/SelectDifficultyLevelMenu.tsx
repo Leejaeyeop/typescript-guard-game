@@ -19,13 +19,21 @@ export function SelectDifficultyLevel() {
 
   return (
     <>
-      <MenuButton onClick={() => onClickHandler("BEGINNER")}>
+      <MenuButton
+        aria-label="Beginner"
+        onClick={() => onClickHandler("BEGINNER")}
+      >
         Beginner
       </MenuButton>
-      <MenuButton onClick={() => onClickHandler("INTERMEDIATE")}>
+      <MenuButton
+        aria-label="Intermediate"
+        onClick={() => onClickHandler("INTERMEDIATE")}
+      >
         Intermediate
       </MenuButton>
-      <MenuButton onClick={() => onClickHandler("EXPERT")}>Expert</MenuButton>
+      <MenuButton aria-label="Expert" onClick={() => onClickHandler("EXPERT")}>
+        Expert
+      </MenuButton>
     </>
   );
 }

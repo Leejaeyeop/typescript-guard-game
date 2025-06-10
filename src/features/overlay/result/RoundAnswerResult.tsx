@@ -11,7 +11,7 @@ export function RoundAnswerResult() {
   const { roundState, roundStateDispatch } = useRoundManager();
 
   return (
-    <div
+    <section
       className="absolute w-full h-full z-[5] top-0 flex justify-center items-center"
       onAnimationEnd={() => {
         roundStateDispatch({ type: "ANIMATION_FINISHED" });
@@ -38,6 +38,6 @@ export function RoundAnswerResult() {
           priority={true}
         />
       </div>
-    </div>
+    </section>
   );
 }

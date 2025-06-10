@@ -1,11 +1,6 @@
 import { useRef } from "react";
 import Image from "next/image";
 
-interface ResizableContainerProps {
-  children: React.ReactNode;
-  hidden: boolean;
-}
-
 const MD_MIN_WIDHT = 0.7;
 const MD_MIN_HEIGHT = 0.3;
 
@@ -14,6 +9,11 @@ const MIN_HEIGHT = 0.25;
 
 const MAX_WIDHT = 0.8;
 const MAX_HEIGHT = 0.4;
+
+interface ResizableContainerProps {
+  children: React.ReactNode;
+  hidden: boolean;
+}
 
 const ResizableContainer = ({ children, hidden }: ResizableContainerProps) => {
   const originalSize = useRef({ width: MIN_WIDHT, height: MIN_HEIGHT }); // % 기준 (w-[70%], h-1/3)
@@ -123,21 +123,24 @@ const ResizableContainer = ({ children, hidden }: ResizableContainerProps) => {
         <button
           className="cursor-pointer text-xs hover:opacity-50"
           onClick={() => handleClick("MIN")}
+          aria-label="minimize size"
         >
           [MIN]
         </button>
         <button
           className="cursor-pointer text-xs hover:opacity-50"
           onClick={() => handleClick("MAX")}
+          aria-label="maximize size"
         >
           [MAX]
         </button>
 
         {/* 드래그 핸들 오른쪽 대각선 */}
-        <div
+        <button
           className="w-3 h-3 cursor-sw-resize"
           onMouseDown={handleMouseDown}
           onTouchStart={handleMouseDown}
+          aria-label="sizing handle"
         >
           <Image
             src="/assets/ui/resize.png"
@@ -147,7 +150,7 @@ const ResizableContainer = ({ children, hidden }: ResizableContainerProps) => {
             loading="eager"
             priority={true}
           />
-        </div>
+        </button>
       </div>
       <div className="relative h-[calc(100%-24px)] w-full">{children}</div>
       {/* 말풍선 꼬리 */}

@@ -10,10 +10,16 @@ function MainMenuContent() {
 
   return (
     <>
-      <MenuButton onClick={() => pushMenuContext(<SelectDifficultyLevel />)}>
+      <MenuButton
+        aria-label="Play Game"
+        onClick={() => pushMenuContext(<SelectDifficultyLevel />)}
+      >
         Play Game
       </MenuButton>
-      <MenuButton onClick={() => pushMenuContext(<CreditMenu />)}>
+      <MenuButton
+        aria-label="Credit"
+        onClick={() => pushMenuContext(<CreditMenu />)}
+      >
         Credit
       </MenuButton>
     </>

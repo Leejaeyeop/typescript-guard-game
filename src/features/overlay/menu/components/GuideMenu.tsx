@@ -67,7 +67,10 @@ function GuideMenuContent() {
         </label>
       </div>
 
-      <MenuButton onClick={() => setMenuOverlay(<MainMenu />)}>
+      <MenuButton
+        aria-label="Click to Play"
+        onClick={() => setMenuOverlay(<MainMenu />)}
+      >
         Click to Play
       </MenuButton>
     </>
