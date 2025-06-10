@@ -9,7 +9,7 @@ export function TopHUD() {
     useShallow((state) => [state.setMenuOverlay, state.openMenu])
   );
 
-  const { lifePoints, curRoundIdx, curStageQuizzes } = useStageManager();
+  const { stageState } = useStageManager();
 
   return (
     <header className="absolute top-0 left-0 w-full h-[10vh] flex items-center justify-between px-6 text-white">
@@ -17,10 +17,10 @@ export function TopHUD() {
       <div className="flex items-center space-x-6 text-lg font-semibold">
         <div className="flex items-center gap-1">
           <span>❤️ x</span>
-          <span>{lifePoints}</span>
+          <span>{stageState.lifePoints}</span>
         </div>
         <div>
-          {curRoundIdx + 1} / {curStageQuizzes.length}
+          {stageState.currentRoundIndex + 1} / {stageState.quizzes.length}
         </div>
       </div>
 

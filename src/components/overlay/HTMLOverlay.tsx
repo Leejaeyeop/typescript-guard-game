@@ -12,7 +12,7 @@ import QuizReviewPage from "./result/QuizReview";
 
 export default function HTMLOverlay() {
   const { activeScene } = useAppStore();
-  const { curRoundQuiz, isVisibleTopHUD, isPaused } = useStageManager();
+  const { stageState, currentQuiz } = useStageManager();
 
   const { isVisibleAnswer, isVisibleActionBar, isVisibleRoundResult } =
     useRoundManager();
@@ -29,17 +29,17 @@ export default function HTMLOverlay() {
   return (
     <>
       {/* top HUD */}
-      {isVisibleTopHUD && <TopHUD />}
+      {stageState.isVisibleTopHUD && <TopHUD />}
       {/* question */}
       <ResizableContainer hidden={!isVisibleAnswer}>
-        <MonacoEditor value={curRoundQuiz?.question} />
+        <MonacoEditor value={currentQuiz?.question} />
       </ResizableContainer>
       {/* action bar */}
       {isVisibleActionBar && <ActionBar />}
       {/* menu */}
       {isMenuOpen && menuOverlay}
       {/* pause */}
-      {isPaused && (
+      {stageState.isPaused && (
         <div className="absolute top-0 w-full h-full backdrop-blur-md" />
       )}
       {/* answer result */}

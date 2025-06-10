@@ -3,110 +3,146 @@ import {
   Dispatch,
   ReactNode,
   RefObject,
-  SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
-  useState,
 } from "react";
 import { Quiz } from "@/types/quiz";
 import { DifficultyLevel } from "@/types/difficultyLevel";
 import { useMenuStore } from "@/store/useMenuStore";
 import { StageResultMenu } from "@/components/overlay/menu/StageResultMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
+import { getRandomQuizzesByDifficulty } from "@/utils/quizUtils";
 
-type StageContextType = {
-  // correctCount
-  correctCount: number;
-  // 현재 라운드 idx
-  curRoundIdx: number;
-  setCurRoundIdx: Dispatch<SetStateAction<number>>;
-  // 퀴즈들
-  curStageQuizzes: Quiz[];
-  curStagePhase: (typeof stagePhase)[number];
-  setStagePhaseIdx: Dispatch<SetStateAction<number>>;
-  setStageDifficultyLevel: Dispatch<SetStateAction<DifficultyLevel | null>>;
-  curRoundQuiz: Quiz;
-  reportRoundOutcome: (result: {
-    isCorrect: boolean;
-    userAnswer: boolean;
-  }) => void;
-  isVisibleTopHUD: boolean;
-  initStage: () => void;
-  isPaused: boolean;
-  setIsPaused: Dispatch<SetStateAction<boolean>>;
-  lifePoints: number;
-  userAnswerResults: RefObject<
-    ({
-      wasCorrect: boolean;
-      userAnswer: boolean;
-    } & Quiz)[]
-  >;
-};
-
-const stagePhase = [
+// --- Types and Constants ---
+type STAGE_PHASES = [
   "NONE",
   "PREPARE",
   "STAGE_START",
   "ROUNDS_IN_PROGRESS",
   "STAGE_RESULTS",
   "STAGE_CONCLUDED",
-] as const;
+];
 
-const initialStageState = {
-  stagePhaseIdx: 0,
-  stageDifficultyLevel: null,
-  correctCount: 0,
-  curRoundIdx: 0,
-  curStageQuizzes: [],
-  isVisibleTopHUD: false,
-  isPaused: false,
-  lifePoints: 3,
+type StagePhase = STAGE_PHASES[number];
+
+type UserAnswerResult = { wasCorrect: boolean; userAnswer: boolean } & Quiz;
+
+type StageState = {
+  phase: StagePhase;
+  difficultyLevel: DifficultyLevel | null;
+  quizzes: Quiz[];
+  correctCount: number;
+  currentRoundIndex: number;
+  lifePoints: number;
+  isPaused: boolean;
+  isVisibleTopHUD: boolean;
 };
-const StageContext = createContext<StageContextType | undefined>(undefined);
 
-// 전체 문제 갯수
-export const TOTAL_NUMBER_OF_QUESTIONS = 15;
+type StageContextType = {
+  stageState: StageState;
+  dispatch: Dispatch<Action>;
+  currentQuiz: Quiz;
+  userAnswerResults: RefObject<UserAnswerResult[]>;
+  initStage: () => void;
+  reportRoundOutcome: (result: {
+    isCorrect: boolean;
+    userAnswer: boolean;
+  }) => void;
+  setStageDifficulty: (level: DifficultyLevel) => void;
+};
 
-/**
- * 전체 퀴즈 목록에서 특정 난이도의 퀴즈를
- * 최대 N개까지 무작위로 추출하는 함수
- * @param totalQuizzes - 모든 퀴즈가 담긴 배열
- * @param stageDifficultyLevel - 추출할 퀴즈의 난이도 ('easy', 'medium', 'hard')
- * @returns 무작위로 추출된 퀴즈 배열
- */
-function getRandomQuizzesByDifficulty(
-  totalQuizzes: Quiz[],
-  stageDifficultyLevel: DifficultyLevel
-): Quiz[] {
-  // 1. 필터링: 원하는 난이도의 퀴즈만 골라냅니다.
-  const filteredQuizzes = totalQuizzes.filter(
-    (quiz) => quiz.difficultyLevel === stageDifficultyLevel
-  );
+// --- Reducer and Actions ---
 
-  // 2. 순서 섞기 (Fisher-Yates Shuffle 알고리즘)
-  // 원본 배열을 해치지 않기 위해 배열을 복사해서 사용합니다.
-  const shuffledQuizzes = [...filteredQuizzes];
-  let currentIndex = shuffledQuizzes.length;
-  let randomIndex;
+type Action =
+  | { type: "RESET_TO_NONE" }
+  | { type: "SET_DIFFICULTY"; payload: DifficultyLevel }
+  | { type: "INIT_STAGE" }
+  | {
+      type: "PREPARE_STAGE";
+      payload: { allQuizzes: Quiz[]; difficulty: DifficultyLevel };
+    }
+  | { type: "START_STAGE" }
+  | {
+      type: "REPORT_ROUND_OUTCOME";
+      payload: { isCorrect: boolean; userAnswer: boolean };
+    }
+  | { type: "TOGGLE_PAUSE"; payload: boolean };
 
-  // 배열의 마지막 요소부터 처음까지 순회합니다.
-  while (currentIndex !== 0) {
-    // 남은 요소 중에서 무작위 인덱스를 선택합니다.
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
+const initialState: StageState = {
+  phase: "NONE",
+  difficultyLevel: null,
+  quizzes: [],
+  correctCount: 0,
+  currentRoundIndex: 0,
+  lifePoints: 3,
+  isPaused: false,
+  isVisibleTopHUD: false,
+};
 
-    // 현재 요소와 무작위로 선택된 요소를 교환합니다.
-    [shuffledQuizzes[currentIndex], shuffledQuizzes[randomIndex]] = [
-      shuffledQuizzes[randomIndex],
-      shuffledQuizzes[currentIndex],
-    ];
+function stageReducer(stageState: StageState, action: Action): StageState {
+  switch (action.type) {
+    case "RESET_TO_NONE":
+      return { ...initialState };
+    case "SET_DIFFICULTY":
+      return { ...stageState, difficultyLevel: action.payload };
+    case "INIT_STAGE":
+      return { ...stageState, phase: "PREPARE" };
+    case "PREPARE_STAGE":
+      return {
+        ...initialState, // Reset stats for a new stage
+        difficultyLevel: action.payload.difficulty,
+        quizzes: getRandomQuizzesByDifficulty(
+          action.payload.allQuizzes,
+          action.payload.difficulty
+        ),
+        phase: "STAGE_START",
+        isVisibleTopHUD: true,
+      };
+    case "START_STAGE":
+      return { ...stageState, phase: "ROUNDS_IN_PROGRESS" };
+    case "REPORT_ROUND_OUTCOME": {
+      const { isCorrect } = action.payload;
+      const newCorrectCount = isCorrect
+        ? stageState.correctCount + 1
+        : stageState.correctCount;
+      const newLifePoints = isCorrect
+        ? stageState.lifePoints
+        : stageState.lifePoints - 1;
+
+      const isLastQuiz =
+        stageState.currentRoundIndex === stageState.quizzes.length - 1;
+      const isGameOver = newLifePoints === 0;
+
+      if (isLastQuiz || isGameOver) {
+        return {
+          ...stageState,
+          correctCount: newCorrectCount,
+          lifePoints: newLifePoints,
+          phase: "STAGE_RESULTS",
+          isVisibleTopHUD: false,
+        };
+      }
+      return {
+        ...stageState,
+        correctCount: newCorrectCount,
+        lifePoints: newLifePoints,
+        currentRoundIndex: stageState.currentRoundIndex + 1,
+      };
+    }
+    case "TOGGLE_PAUSE":
+      return { ...stageState, isPaused: action.payload };
+    default:
+      throw new Error("Unhandled action type in stageReducer");
   }
-
-  // 3. 잘라내기: 섞인 배열의 앞에서부터 최대 문제 개수만큼 잘라냅니다.
-  return shuffledQuizzes.slice(0, TOTAL_NUMBER_OF_QUESTIONS);
 }
+
+// --- Context and Provider ---
+
+const StageContext = createContext<StageContextType | undefined>(undefined);
 
 interface StageProviderProps {
   children: ReactNode;
@@ -117,183 +153,107 @@ export const StageProvider = ({
   children,
   totalQuizzes,
 }: StageProviderProps) => {
-  // 스테이지 페이즈
-  const [stagePhaseIdx, setStagePhaseIdx] = useState(
-    initialStageState.stagePhaseIdx
-  );
+  const [stageState, dispatch] = useReducer(stageReducer, initialState);
   const { activeScene } = useAppStore();
-
-  // 스테이지 난이도
-  const [stageDifficultyLevel, setStageDifficultyLevel] =
-    useState<DifficultyLevel | null>(initialStageState.stageDifficultyLevel);
-  const [correctCount, setCorrectCount] = useState(
-    initialStageState.correctCount
-  );
-  const [isVisibleTopHUD, setIsVisibleTopHUD] = useState(
-    initialStageState.isVisibleTopHUD
-  );
-  const [curRoundIdx, setCurRoundIdx] = useState(initialStageState.curRoundIdx);
-  const [isPaused, setIsPaused] = useState(initialStageState.isPaused);
-  const [curStageQuizzes, setCurStageQuizzes] = useState<Quiz[]>([]);
-  const [lifePoints, setLifePoints] = useState(initialStageState.lifePoints);
-
-  // 라운드 인데스, 유저 정답 여부
-  const userAnswerResults = useRef<
-    ({ wasCorrect: boolean; userAnswer: boolean } & Quiz)[]
-  >([]);
-
   const { openMenu, setMenuOverlay } = useMenuStore();
 
-  // reset 로직
-  const resetStates = () => {
-    setCorrectCount(initialStageState.correctCount);
-    setIsVisibleTopHUD(initialStageState.isVisibleTopHUD);
-    setCurRoundIdx(initialStageState.curRoundIdx);
-    setCurStageQuizzes(initialStageState.curStageQuizzes);
-    setIsPaused(initialStageState.isPaused);
-    setLifePoints(initialStageState.lifePoints);
+  const userAnswerResults = useRef<UserAnswerResult[]>([]);
 
-    userAnswerResults.current = [];
-  };
+  const currentQuiz = useMemo<Quiz>(() => {
+    return stageState.quizzes[stageState.currentRoundIndex];
+  }, [stageState.quizzes, stageState.currentRoundIndex]);
 
-  const initStage = () => {
-    setStagePhaseIdx(1);
-  };
+  // Handler functions to simplify dispatching from components
+  const initStage = () => dispatch({ type: "INIT_STAGE" });
+  const setStageDifficulty = (level: DifficultyLevel) =>
+    dispatch({ type: "SET_DIFFICULTY", payload: level });
 
-  const curStagePhase = useMemo(() => {
-    return stagePhase[stagePhaseIdx];
-  }, [stagePhaseIdx]);
-
-  const curRoundQuiz = useMemo<Quiz>(() => {
-    return curStageQuizzes[curRoundIdx];
-  }, [curStageQuizzes, curRoundIdx]);
-
-  // 라운드 결과 확인
-  const reportRoundOutcome = ({
-    isCorrect,
-    userAnswer,
-  }: {
-    isCorrect: boolean;
-    userAnswer: boolean;
-  }) => {
-    userAnswerResults.current.push({
-      ...curRoundQuiz,
-      wasCorrect: isCorrect,
+  const reportRoundOutcome = useCallback(
+    ({
+      isCorrect,
       userAnswer,
-    });
-    // 점수 획득
-    if (isCorrect) {
-      setCorrectCount(correctCount + 1);
-      // 라운드 인덱스, 유저 정답 여부
-    } else {
-      setLifePoints(lifePoints - 1);
+    }: {
+      isCorrect: boolean;
+      userAnswer: boolean;
+    }) => {
+      userAnswerResults.current.push({
+        ...currentQuiz,
+        wasCorrect: isCorrect,
+        userAnswer,
+      });
 
-      // 라운드 종료
-      if (lifePoints === 1) {
-        setStagePhaseIdx(stagePhaseIdx + 1);
-        return;
-      }
-    }
+      dispatch({
+        type: "REPORT_ROUND_OUTCOME",
+        payload: { isCorrect, userAnswer },
+      });
+    },
+    [currentQuiz]
+  );
 
-    if (curRoundIdx === curStageQuizzes.length - 1) {
-      // 퀴즈가 전부 종료됨
-      setStagePhaseIdx(stagePhaseIdx + 1);
-    } else {
-      // 다음 퀴즈로 넘어감
-      setCurRoundIdx(curRoundIdx + 1);
-    }
-  };
-
-  // main menu scene 설정 직후
+  // Effect for handling scene changes from the app store
   useEffect(() => {
     if (activeScene === SCENE_IDS.MAIN) {
-      // none
-      setStagePhaseIdx(0);
+      dispatch({ type: "RESET_TO_NONE" });
+      userAnswerResults.current = [];
     }
   }, [activeScene]);
 
+  // Effect for handling logic based on the current stage phase (Side Effects)
   useEffect(() => {
-    switch (curStagePhase) {
-      case "NONE": {
-        resetStates();
-        break;
-      }
-
-      case "PREPARE": {
-        // 재시작 / 다음 스테이지 바로 시작 등을 상정
-        resetStates();
-        if (totalQuizzes.length === 0 || !stageDifficultyLevel) {
-          window.alert("Quiz data does not exist.");
+    switch (stageState.phase) {
+      case "PREPARE":
+        if (totalQuizzes.length === 0 || !stageState.difficultyLevel) {
+          window.alert("Quiz data or difficulty level is missing.");
+          dispatch({ type: "RESET_TO_NONE" });
           return;
         }
 
-        // 퀴즈를 필터링 하자!
-        setCurStageQuizzes(
-          getRandomQuizzesByDifficulty(totalQuizzes, stageDifficultyLevel)
-        );
-        setIsVisibleTopHUD(true);
+        dispatch({
+          type: "PREPARE_STAGE",
+          payload: {
+            allQuizzes: totalQuizzes,
+            difficulty: stageState.difficultyLevel,
+          },
+        });
+        userAnswerResults.current = [];
 
-        // 다음 페이즈 시작
-        setStagePhaseIdx(2);
         break;
-      }
 
-      case "STAGE_START": {
-        // option 아이콘 생성
-        // 만약 intro 있으면 기타 등등...
-        setStagePhaseIdx(3);
+      case "STAGE_START":
+        // This is a great place for intro animations, then dispatching the next phase.
+        dispatch({ type: "START_STAGE" });
         break;
-      }
-
-      case "ROUNDS_IN_PROGRESS": {
-        // 현재 로직 없음
-        break;
-      }
 
       case "STAGE_RESULTS": {
-        setIsVisibleTopHUD(false);
-        let isFailed = false;
-        // 스테이지 실패 (라이프 포인트 0)
-        if (lifePoints === 0) {
-          isFailed = true;
-        }
+        const isFailed = stageState.lifePoints === 0;
         setMenuOverlay(
           <StageResultMenu
             isFailed={isFailed}
-            TotalNumberOfQuestions={curStageQuizzes.length}
-            correctCount={correctCount}
+            TotalNumberOfQuestions={stageState.quizzes.length}
+            correctCount={stageState.correctCount}
           />
         );
-
         openMenu();
         break;
       }
-
-      default:
-        break;
     }
-  }, [curStagePhase]);
+  }, [stageState.phase]);
+
+  const contextValue = useMemo(
+    () => ({
+      stageState,
+      dispatch,
+      currentQuiz,
+      userAnswerResults,
+      initStage,
+      reportRoundOutcome,
+      setStageDifficulty,
+    }),
+    [stageState, currentQuiz, reportRoundOutcome]
+  );
 
   return (
-    <StageContext.Provider
-      value={{
-        curStageQuizzes,
-        curRoundIdx,
-        setCurRoundIdx,
-        curStagePhase,
-        correctCount,
-        setStagePhaseIdx,
-        setStageDifficultyLevel,
-        curRoundQuiz,
-        reportRoundOutcome,
-        isVisibleTopHUD,
-        initStage,
-        isPaused,
-        setIsPaused,
-        lifePoints,
-        userAnswerResults,
-      }}
-    >
+    <StageContext.Provider value={contextValue}>
       {children}
     </StageContext.Provider>
   );
@@ -301,9 +261,8 @@ export const StageProvider = ({
 
 export function useStageManager() {
   const context = useContext(StageContext);
-
   if (!context) {
-    throw new Error("useRoundManager must be used within a CounterProvider");
+    throw new Error("useStageManager must be used within a StageProvider");
   }
   return context;
 }

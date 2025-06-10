@@ -5,13 +5,13 @@ import { useMenuStore } from "@/store/useMenuStore";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 
 export function SelectDifficultyLevel() {
-  const { setStageDifficultyLevel, initStage } = useStageManager();
+  const { setStageDifficulty, initStage } = useStageManager();
   const { setActiveScene } = useAppStore();
 
   const closeMenu = useMenuStore((state) => state.closeMenu);
 
   const onClickHandler = (level: DifficultyLevel) => {
-    setStageDifficultyLevel(level);
+    setStageDifficulty(level);
     setActiveScene(SCENE_IDS.QUIZ_STAGE);
     initStage();
     closeMenu();

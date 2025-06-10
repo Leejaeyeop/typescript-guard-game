@@ -66,7 +66,7 @@ const initialRoundState = {
 };
 
 export const RoundProvider = ({ children }: { children: ReactNode }) => {
-  const { curStagePhase, reportRoundOutcome, curRoundIdx } = useStageManager();
+  const { stageState, reportRoundOutcome } = useStageManager();
   // 현재 round 페이즈
   const [roundPhaseIdx, setRoundPhaseIdx] = useState(
     initialRoundState.roundPhaseIdx
@@ -144,13 +144,13 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   // state의 phase 를 구독한다
   useEffect(() => {
     // 리셋 하기
-    if (curStagePhase === "NONE" || curStagePhase === "PREPARE") {
+    if (stageState.phase === "NONE" || stageState.phase === "PREPARE") {
       setRoundPhaseIdx(0);
-    } else if (curStagePhase === "ROUNDS_IN_PROGRESS") {
+    } else if (stageState.phase === "ROUNDS_IN_PROGRESS") {
       // 라운드 시작
       setRoundPhaseIdx(1);
     }
-  }, [curStagePhase, curRoundIdx]);
+  }, [stageState.phase, stageState.currentRoundIndex]);
 
   useEffect(() => {
     // 에니메이션 실행 함수
