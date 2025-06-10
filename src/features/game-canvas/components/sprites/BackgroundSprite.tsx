@@ -18,6 +18,8 @@ import {
   SetStateAction,
 } from "react";
 
+const ANIMATION_SPEED = 0.15;
+
 const spritesPath = {
   idle1: "assets/background/idle/idle1.jpeg",
   idle2: "assets/background/idle/idle2.jpeg",
@@ -42,13 +44,12 @@ export type BackgroundSpriteHandle = {
   playIdleAnimation: () => void;
 };
 
-export function BackgroundSprite({
-  ref,
-  setIsLoading,
-}: {
+interface BackgroundSpriteProps {
   ref: Ref<BackgroundSpriteHandle>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
-}) {
+}
+
+export function BackgroundSprite({ ref, setIsLoading }: BackgroundSpriteProps) {
   const spriteRef = useRef<AnimatedSprite>(null);
   const animations =
     useRef<Record<keyof typeof spritesPath, FrameObject>>(null);
@@ -71,6 +72,7 @@ export function BackgroundSprite({
     setLoop(true);
   };
 
+  // guard -> guard_idle -> guard -> idle (역순)
   const playGuardAnimation = () => {
     if (!animations.current) return;
     setTextures([
@@ -102,7 +104,6 @@ export function BackgroundSprite({
       playIdleAnimation,
     };
   }, []);
-  // guard -> guard_idle -> guard -> idle (역순)
 
   // Preload the sprite if it hasn't been loaded yet
   useEffect(() => {
@@ -126,7 +127,7 @@ export function BackgroundSprite({
       anchor={0.5}
       textures={textures}
       loop={loop}
-      animationSpeed={0.15}
+      animationSpeed={ANIMATION_SPEED}
       x={MAX_SIZE / 2}
       y={MAX_SIZE / 2}
       width={MAX_SIZE}

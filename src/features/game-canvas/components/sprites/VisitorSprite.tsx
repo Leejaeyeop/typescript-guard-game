@@ -13,8 +13,15 @@ export type VisitorSpriteHandle = {
   setStatus: (status: "appear" | "disappear" | "idle") => void;
 };
 
-export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
-  // The Pixi.js `Sprite`
+interface VisitorSpriteProps {
+  ref: Ref<VisitorSpriteHandle>;
+}
+
+const IDLE_POSITION_Y = MAX_SIZE / 1.25;
+const DISAPPEAR_POSITION_Y = MAX_SIZE + 200;
+const POSITION_VARIATION_PER_FRAME = 5;
+
+export function VisitorSprite({ ref }: VisitorSpriteProps) {
   const spriteRef = useRef(null);
   const [texture, setTexture] = useState(Texture.EMPTY);
   const [positionY, setPositionY] = useState(MAX_SIZE);
@@ -34,15 +41,16 @@ export function VisitorSprite({ ref }: { ref: Ref<VisitorSpriteHandle> }) {
 
   useTick(() => {
     if (status.current === "appear") {
-      if (positionY > MAX_SIZE / 1.25) {
-        setPositionY((prev) => prev - 4);
+      // position 이 감소 되어야 스프라이트가 위로 상승함
+      if (positionY > IDLE_POSITION_Y) {
+        setPositionY((prev) => prev - POSITION_VARIATION_PER_FRAME);
       } else {
         status.current = "idle";
         roundStateDispatch({ type: "ANIMATION_FINISHED" });
       }
     } else if (status.current === "disappear") {
-      if (positionY < MAX_SIZE + 200) {
-        setPositionY((prev) => prev + 4);
+      if (positionY < DISAPPEAR_POSITION_Y) {
+        setPositionY((prev) => prev + POSITION_VARIATION_PER_FRAME);
       } else {
         status.current = "idle";
         roundStateDispatch({ type: "ANIMATION_FINISHED" });
