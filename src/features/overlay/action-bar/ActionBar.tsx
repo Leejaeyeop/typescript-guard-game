@@ -1,38 +1,37 @@
+// The refactored ActionBar component
+
+import { ActionButton } from "@/components/ui/button/ActionButton";
 import { useRoundManager } from "@/contexts/RoundProvider";
-import Image from "next/image";
 
 export function ActionBar() {
   const { roundState, submitAnswer } = useRoundManager();
+  const isActionDisabled = roundState.phase !== "PRESENTING_QUESTION";
+
   return (
-    <footer className="absolute bottom-0 gap-[5%] w-full h-1/6 flex justify-center">
-      <button
-        className="w-1/5 hover:cursor-pointer disabled:opacity-50"
-        disabled={roundState.phase !== "PRESENTING_QUESTION"}
-        onClick={() => submitAnswer(true)}
+    <footer className="absolute bottom-0 w-full h-1/6">
+      {/* 두 버튼을 그룹으로 묶고, 그룹의 목적을 설명하는 레이블 제공 */}
+      <div
+        role="group"
+        aria-labelledby="action-bar-heading"
+        className="h-full w-full flex justify-center items-center gap-[5%]"
       >
-        <Image
-          src="/assets/ui/pass_button.webp"
-          alt="pass_button"
-          width={500}
-          height={100}
-          loading="eager"
-          priority={true}
+        {/* 스크린 리더 사용자에게 그룹의 목적을 알려주는 숨은 제목 */}
+        <h2 id="action-bar-heading" className="sr-only">
+          액션 선택
+        </h2>
+        <ActionButton
+          label="pass"
+          imageSrc="/assets/ui/pass_button.webp"
+          onClick={() => submitAnswer(true)}
+          disabled={isActionDisabled}
         />
-      </button>
-      <button
-        className="w-1/5 hover:cursor-pointer disabled:opacity-50"
-        disabled={roundState.phase !== "PRESENTING_QUESTION"}
-        onClick={() => submitAnswer(false)}
-      >
-        <Image
-          src="/assets/ui/guard_button.webp"
-          alt="pass_button"
-          width={500}
-          height={100}
-          loading="eager"
-          priority={true}
+        <ActionButton
+          label="guard"
+          imageSrc="/assets/ui/guard_button.webp"
+          onClick={() => submitAnswer(false)}
+          disabled={isActionDisabled}
         />
-      </button>
+      </div>
     </footer>
   );
 }
