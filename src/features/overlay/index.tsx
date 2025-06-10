@@ -9,12 +9,16 @@ import { useShallow } from "zustand/shallow";
 import ResizableContainer from "./question/ResizableContainer";
 import QuizReviewPage from "./result/QuizReviewPage";
 import { TopHUD } from "./hud/TopHUD";
+import { useMemo, useState } from "react";
 
 export default function HTMLOverlay() {
   const { activeScene } = useAppStore();
   const { stageState, currentQuiz } = useStageManager();
 
   const { roundState } = useRoundManager();
+
+  // monaco loading 상태 추가
+  const [isEditorMounted, setIsEditorMounted] = useState(false);
 
   const [isMenuOpen, menuOverlay, showQuizReview] = useMenuStore(
     useShallow((state) => [
@@ -25,16 +29,25 @@ export default function HTMLOverlay() {
     ])
   );
 
+  const isActionDisabled = useMemo(
+    () => isEditorMounted && roundState.phase !== "PRESENTING_QUESTION",
+    [isEditorMounted, roundState.phase] // state 객체가 바뀔 때만 value가 새로 생성됨
+  );
   return (
     <>
       {/* top HUD */}
       {stageState.isVisibleTopHUD && <TopHUD />}
       {/* question */}
       <ResizableContainer hidden={!roundState.isVisibleAnswer}>
-        <MonacoEditor value={currentQuiz?.question} />
+        <MonacoEditor
+          value={currentQuiz?.question}
+          setIsEditorMounted={setIsEditorMounted}
+        />
       </ResizableContainer>
       {/* action bar */}
-      {roundState.isVisibleActionBar && <ActionBar />}
+      {roundState.isVisibleActionBar && (
+        <ActionBar isActionDisabled={isActionDisabled} />
+      )}
       {/* menu */}
       {isMenuOpen && menuOverlay}
       {/* pause */}
