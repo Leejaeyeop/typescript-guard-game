@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MedievalSharp } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const metadataBase = new URL(
@@ -87,6 +88,7 @@ export default function RootLayout({
         className={`${medievalSharp.className} antialiased bg-black text-white`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );

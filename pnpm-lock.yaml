@@ -11,6 +11,9 @@ dependencies:
   '@pixi/react':
     specifier: 8.0.0-beta.25
     version: 8.0.0-beta.25(@types/react@19.1.6)(pixi.js@8.10.1)(react@19.1.0)
+  '@vercel/analytics':
+    specifier: ^1.5.0
+    version: 1.5.0(next@15.3.3)(react@19.1.0)
   convex:
     specifier: ^1.24.8
     version: 1.24.8(react@19.1.0)
@@ -2653,6 +2656,36 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@vercel/analytics@1.5.0(next@15.3.3)(react@19.1.0):
+    resolution: {integrity: sha512-MYsBzfPki4gthY5HnYN7jgInhAZ7Ac1cYDoRWFomwGHWEX7odTEzbtg9kf/QSo7XEsEAqlQugA6gJ2WS2DEa3g==}
+    peerDependencies:
+      '@remix-run/react': ^2
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
+    dependencies:
+      next: 15.3.3(@babel/core@7.27.4)(react-dom@19.1.0)(react@19.1.0)
+      react: 19.1.0
+    dev: false
 
   /@webgpu/types@0.1.61:
     resolution: {integrity: sha512-w2HbBvH+qO19SB5pJOJFKs533CdZqxl3fcGonqL321VHkW7W/iBo6H8bjDy6pr/+pbMwIu5dnuaAxH7NxBqUrQ==}
