@@ -12,6 +12,7 @@
 ## ⚔️ Introduction
 
 https://www.typescriptquiz.com/
+
 ![Type Guard Gameplay](./public/og-image.png)
 
 ## ⚔️ Introduction
