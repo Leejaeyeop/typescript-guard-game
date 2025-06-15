@@ -15,8 +15,6 @@ https://www.typescriptquiz.com/
 
 ![Type Guard Gameplay](./public/og-image.png)
 
-## ⚔️ Introduction
-
 Welcome to **Type Guard**!
 
 This is 'Type World', a peaceful realm built upon the strict rules of type safety. However, chaotic forces known as 'Compile Errors' and 'Runtime Errors' have recently invaded, threatening the world's stability.
@@ -46,23 +44,13 @@ You are a **Type Guard**, the last line of defense for Type World. Your mission 
 1. install Dependencies:
 
 ```bash
-npm install
-# or
-yarn install
-# or
 pnpm install
-# or
-bun install
 ```
 
 2. Run the Convex Dev Environment:
 
 ```bash
-npx convex dev
-# or
 pnpm exec convex dev
-# or
-bunx convex dev
 ```
 
 3. Set Up Environment Variables:
@@ -84,21 +72,11 @@ REVALIDATION_SECRET="[Your-strong-secret-token]"
 
 ```bash
 # 'quizzes' should be replaced with the actual table name defined in your Convex schema.
-npx convex import --table quizzes data/quizzesData.jsonl --replace --yes
-# or
 pnpm convex import --table quizzes data/quizzesData.jsonl --replace --yes
-# or
-bunx convex import --table quizzes data/quizzesData.jsonl --replace --yes
 ```
 
 5. Run the Next.js Development Server
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
