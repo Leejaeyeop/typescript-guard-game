@@ -2,7 +2,7 @@ import { Assets, Texture } from "pixi.js";
 import { Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useTick } from "@pixi/react";
 import { MAX_SIZE } from "@/constants/sizes";
-import { useRoundManager } from "@/contexts/RoundProvider";
+import { useRoundManager } from "@/contexts/round/RoundProvider";
 // import { useTick } from "@pixi/react";
 
 function getRandomNumber() {

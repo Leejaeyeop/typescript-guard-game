@@ -1,5 +1,5 @@
-import { useRoundManager } from "@/contexts/RoundProvider";
-import { useStageManager } from "@/contexts/StageProvider";
+import { useRoundManager } from "@/contexts/round/RoundProvider";
+import { useStageManager } from "@/contexts/stage/StageProvider";
 import MonacoEditor from "@/features/overlay/question/MonacoEditor";
 import { ActionBar } from "@/features/overlay/action-bar/ActionBar";
 import { RoundAnswerResult } from "@/features/overlay/result/RoundAnswerResult";

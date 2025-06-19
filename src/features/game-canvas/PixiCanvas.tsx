@@ -5,7 +5,7 @@ import { Application, ApplicationRef, extend } from "@pixi/react";
 import { Container, Graphics, Sprite, AnimatedSprite } from "pixi.js";
 import { Dispatch, SetStateAction, useRef } from "react";
 import { MAX_SIZE } from "@/constants/sizes";
-import { useRoundManager } from "@/contexts/RoundProvider";
+import { useRoundManager } from "@/contexts/round/RoundProvider";
 
 extend({
   Graphics,

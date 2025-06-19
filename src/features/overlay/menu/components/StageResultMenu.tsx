@@ -23,17 +23,13 @@ function StageResultMenuContent({
   return (
     <>
       {isFailed ? (
-        <>
-          <h2 className="text-2xl text-red-500 mb-3">Failed...</h2>
-        </>
+        <h2 className="text-2xl text-red-500 mb-3">Failed...</h2>
       ) : (
-        <>
-          <h2 className="text-2xl text-blue-500 mb-3">Success</h2>
-          <div>
-            score: {correctCount} / {TotalNumberOfQuestions}
-          </div>
-        </>
+        <h2 className="text-2xl text-blue-500 mb-3">Success</h2>
       )}
+      <div>
+        score: {correctCount} / {TotalNumberOfQuestions}
+      </div>
       <MenuButton
         aria-label="View Results"
         className="mb-5"

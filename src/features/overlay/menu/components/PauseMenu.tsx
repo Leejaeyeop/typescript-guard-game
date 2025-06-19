@@ -1,14 +1,12 @@
 import { MenuOverlay } from "../MenuOverlay";
 import { useMenuStore } from "@/store/useMenuStore";
-import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
-import { useStageManager } from "@/contexts/StageProvider";
+import { useStageManager } from "@/contexts/stage/StageProvider";
 import { useEffect } from "react";
 import { MenuButton } from "@/components/ui/button/MenuButton";
 
 function PauseMenuContent() {
   const { closeMenu } = useMenuStore();
-  const { setActiveScene } = useAppStore();
-  const { initStage, stageStateDispatch } = useStageManager();
+  const { initStage, stageStateDispatch, quitStage } = useStageManager();
 
   useEffect(() => {
     stageStateDispatch({ type: "TOGGLE_PAUSE", payload: true });
@@ -20,8 +18,8 @@ function PauseMenuContent() {
 
   return (
     <>
-      <MenuButton aria-label="Continue" onClick={() => closeMenu()}>
-        Continue
+      <MenuButton aria-label="Resume" onClick={() => closeMenu()}>
+        Resume
       </MenuButton>
       <MenuButton
         aria-label="Restart Game"
@@ -33,12 +31,12 @@ function PauseMenuContent() {
         Restart Game
       </MenuButton>
       <MenuButton
-        aria-label="Back to main"
+        aria-label="Quit"
         onClick={() => {
-          setActiveScene(SCENE_IDS.MAIN);
+          quitStage();
         }}
       >
-        Back to main
+        Quit
       </MenuButton>
     </>
   );

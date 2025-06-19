@@ -1,5 +1,5 @@
 import { useMenuStore } from "@/store/useMenuStore";
-import { useStageManager } from "@/contexts/StageProvider";
+import { useStageManager } from "@/contexts/stage/StageProvider";
 import { QuizReviewCard } from "./components/QuizReviewCard";
 
 const QuizReviewPage = () => {
@@ -17,15 +17,21 @@ const QuizReviewPage = () => {
           <h2 className="text-xl">Close [X]</h2>
         </button>
       </header>
-      {userAnswerResults.current.map((result, index) => (
-        <QuizReviewCard
-          key={result.id}
-          questionNumber={index + 1}
-          quiz={result}
-          userAnswer={result.userAnswer}
-          wasCorrect={result.wasCorrect}
-        />
-      ))}
+      {userAnswerResults.current.length === 0 ? (
+        <div className="flex justify-center items-center h-full">
+          <p className="text-2xl">No answer result.</p>
+        </div>
+      ) : (
+        userAnswerResults.current.map((result, index) => (
+          <QuizReviewCard
+            key={result.id}
+            questionNumber={index + 1}
+            quiz={result}
+            userAnswer={result.userAnswer}
+            wasCorrect={result.wasCorrect}
+          />
+        ))
+      )}
     </article>
   );
 };

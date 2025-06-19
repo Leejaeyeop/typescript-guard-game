@@ -1,4 +1,4 @@
-import { useStageManager } from "@/contexts/StageProvider";
+import { useStageManager } from "@/contexts/stage/StageProvider";
 import { DifficultyLevel } from "@/types/difficultyLevel";
 import { useMenuStore } from "@/store/useMenuStore";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
