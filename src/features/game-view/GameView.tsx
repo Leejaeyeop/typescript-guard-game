@@ -2,8 +2,8 @@
 
 import { useRef, useState } from "react";
 
-import { RoundProvider } from "../../contexts/RoundProvider";
-import { StageProvider } from "../../contexts/StageProvider";
+import { RoundProvider } from "../../contexts/round/RoundProvider";
+import { StageProvider } from "../../contexts/stage/StageProvider";
 
 import HTMLOverlay from "@/features/overlay";
 

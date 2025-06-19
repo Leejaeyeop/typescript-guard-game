@@ -13,42 +13,13 @@ import {
   useReducer,
   useCallback,
 } from "react";
-import { useStageManager } from "./StageProvider";
+import { useStageManager } from "../stage/StageProvider";
 import { BackgroundSpriteHandle } from "@/features/game-canvas/components/sprites/BackgroundSprite";
 import { VisitorSpriteHandle } from "@/features/game-canvas/components/sprites/VisitorSprite";
+import { RoundState } from "./RoundTypes";
+import { Action, roundReducer } from "./RoundReducer";
 
 // --- 타입 및 상수 정의 ---
-
-const ROUND_RESULT = {
-  NONE: "NONE",
-  RIGHT: "RIGHT",
-  WRONG: "WRONG",
-} as const;
-
-type RoundResult = (typeof ROUND_RESULT)[keyof typeof ROUND_RESULT];
-
-type ROUND_PHASES = [
-  "NONE",
-  "ROUND_START",
-  "PRESENTING_QUESTION",
-  "ANSWER_SUBMITTED",
-  "SHOWING_RESULT",
-  "ROUND_ENDED",
-];
-
-type RoundPhase = ROUND_PHASES[number];
-
-type RoundState = {
-  phase: RoundPhase;
-  userAnswer: boolean | null;
-  correctAnswer: boolean | null;
-  isVisibleAnswer: boolean;
-  isVisibleActionBar: boolean;
-  isVisibleVisitor: boolean;
-  pendingAnimationsCount: number;
-  isVisibleRoundResult: boolean;
-  roundResult: RoundResult;
-};
 
 type RoundContextType = {
   roundState: RoundState;
@@ -59,22 +30,15 @@ type RoundContextType = {
   setCorrectAnswer: (answer: boolean) => void;
 };
 
+export const ROUND_RESULT = {
+  NONE: "NONE",
+  RIGHT: "RIGHT",
+  WRONG: "WRONG",
+} as const;
+
 const RoundContext = createContext<RoundContextType | undefined>(undefined);
 
-// --- Reducer 및 Action 정의 ---
-
-type Action =
-  | { type: "RESET_ROUND" }
-  | { type: "START_ROUND" }
-  | { type: "PRESENT_QUESTION" }
-  | { type: "SET_CORRECT_ANSWER"; payload: boolean }
-  | { type: "SUBMIT_ANSWER"; payload: boolean }
-  | { type: "SHOW_RESULT" }
-  | { type: "END_ROUND" }
-  | { type: "ANIMATION_STARTED" }
-  | { type: "ANIMATION_FINISHED" };
-
-const initialState: RoundState = {
+export const initialState: RoundState = {
   phase: "NONE",
   userAnswer: null,
   correctAnswer: null,
@@ -85,76 +49,6 @@ const initialState: RoundState = {
   isVisibleRoundResult: false,
   roundResult: ROUND_RESULT.NONE,
 };
-
-function getNextPhaseAfterAnimation(phase: RoundPhase): RoundPhase {
-  switch (phase) {
-    case "ROUND_START":
-      return "PRESENTING_QUESTION";
-    case "ANSWER_SUBMITTED":
-      return "SHOWING_RESULT";
-    case "SHOWING_RESULT":
-      return "ROUND_ENDED";
-    default:
-      return phase;
-  }
-}
-
-function roundReducer(state: RoundState, action: Action): RoundState {
-  switch (action.type) {
-    case "RESET_ROUND":
-      return { ...initialState };
-    case "START_ROUND":
-      return { ...state, phase: "ROUND_START", isVisibleVisitor: true };
-    case "PRESENT_QUESTION":
-      return {
-        ...state,
-        phase: "PRESENTING_QUESTION",
-        isVisibleAnswer: true,
-        isVisibleActionBar: true,
-      };
-    case "SET_CORRECT_ANSWER":
-      return { ...state, correctAnswer: action.payload };
-    case "SUBMIT_ANSWER":
-      return {
-        ...state,
-        phase: "ANSWER_SUBMITTED",
-        userAnswer: action.payload,
-        isVisibleAnswer: false,
-        isVisibleActionBar: false,
-      };
-    case "SHOW_RESULT": {
-      const isCorrect = state.correctAnswer === state.userAnswer;
-      return {
-        ...state,
-        // phase: "SHOWING_RESULT",
-        roundResult: isCorrect ? ROUND_RESULT.RIGHT : ROUND_RESULT.WRONG,
-        isVisibleVisitor: false,
-        isVisibleRoundResult: true,
-      };
-    }
-    case "END_ROUND":
-      return { ...state, phase: "ROUND_ENDED", isVisibleRoundResult: false };
-    case "ANIMATION_STARTED":
-      return {
-        ...state,
-        pendingAnimationsCount: state.pendingAnimationsCount + 1,
-      };
-    case "ANIMATION_FINISHED": {
-      const newCount = state.pendingAnimationsCount - 1;
-      if (newCount === 0) {
-        // 모든 애니메이션이 끝나면 다음 단계로 전환
-        return {
-          ...state,
-          pendingAnimationsCount: 0,
-          phase: getNextPhaseAfterAnimation(state.phase),
-        };
-      }
-      return { ...state, pendingAnimationsCount: newCount };
-    }
-    default:
-      return state;
-  }
-}
 
 // --- Provider 컴포넌트 ---
 
@@ -181,7 +75,11 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (stageState.phase === "ROUNDS_IN_PROGRESS") {
       roundStateDispatch({ type: "START_ROUND" });
-    } else if (stageState.phase === "NONE" || stageState.phase === "PREPARE") {
+    } else if (
+      stageState.phase === "NONE" ||
+      stageState.phase === "PREPARE" ||
+      stageState.phase === "STAGE_RESULTS"
+    ) {
       roundStateDispatch({ type: "RESET_ROUND" });
     }
   }, [stageState.phase, stageState.currentRoundIndex]);
@@ -228,7 +126,7 @@ export const RoundProvider = ({ children }: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundState.phase]);
 
-  const contextValue = useMemo(
+  const contextValue = useMemo<RoundContextType>(
     () => ({
       roundState,
       roundStateDispatch,

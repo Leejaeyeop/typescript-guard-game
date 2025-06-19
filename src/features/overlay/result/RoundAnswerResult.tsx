@@ -1,4 +1,4 @@
-import { useRoundManager } from "@/contexts/RoundProvider";
+import { useRoundManager } from "@/contexts/round/RoundProvider";
 import Image from "next/image";
 
 import rightText from "@/assets/ui/text/right_text.webp";

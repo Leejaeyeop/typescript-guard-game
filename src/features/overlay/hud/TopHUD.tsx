@@ -1,6 +1,6 @@
 import { useMenuStore } from "@/store/useMenuStore";
 import { useShallow } from "zustand/shallow";
-import { useStageManager } from "@/contexts/StageProvider";
+import { useStageManager } from "@/contexts/stage/StageProvider";
 import Image from "next/image";
 import { PauseMenu } from "../menu/components/PauseMenu";
 
