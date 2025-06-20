@@ -117,7 +117,7 @@ const ResizableContainer = ({ children, hidden }: ResizableContainerProps) => {
       ref={boxRef}
       className={`absolute bottom-[45%] left-1/2 transform -translate-x-1/2 ${
         hidden && "hidden"
-      } h-1/3 w-[70%] md:h-[25%] md:w-1/2 bg-gray-600 px-2 py-2 rounded-xl shadow-md`}
+      } h-1/3 w-[70%] md:h-[25%] md:w-1/2 bg-blue-300 dark:bg-gray-600 px-2 py-2 rounded-xl shadow-md`}
     >
       <div className="h-5 flex text-white gap-4 justify-end">
         <button
@@ -154,7 +154,7 @@ const ResizableContainer = ({ children, hidden }: ResizableContainerProps) => {
       </div>
       <div className="relative h-[calc(100%-24px)] w-full">{children}</div>
       {/* 말풍선 꼬리 */}
-      <div className="absolute left-1/2 bottom-[-7px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-gray-600"></div>
+      <div className="absolute left-1/2 bottom-[-7px] w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-blue-300 dark:border-t-gray-600"></div>
     </div>
   );
 };

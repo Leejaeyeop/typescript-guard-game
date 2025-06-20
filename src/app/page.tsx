@@ -14,7 +14,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="w-screen h-screen flex items-center justify-center flex-col bg-black">
+    <main className="w-screen h-screen flex items-center justify-center flex-col bg-light dark:bg-black">
       <div
         className={`flex-grow w-full h-full flex flex-col items-center justify-center`}
         style={{

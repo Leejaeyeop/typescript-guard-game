@@ -7,8 +7,8 @@ const QuizReviewPage = () => {
   const { userAnswerResults } = useStageManager();
 
   return (
-    <article className="absolute top-0 w-full h-full bg-black z-[99]">
-      <header className="sticky top-0 h-10 flex items-center justify-end bg-black ">
+    <article className="absolute top-0 w-full h-full bg-light dark:bg-black z-[99]">
+      <header className="sticky top-0 h-10 flex items-center justify-end bg-light dark:bg-black ">
         <button
           className="hover:cursor-pointer hover:opacity-80"
           aria-label="Close Review"

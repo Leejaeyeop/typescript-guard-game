@@ -29,10 +29,10 @@ const CreditMenu = () => {
       <div className="space-y-3">
         <h3 className="text-2xl text-cyan-400">Email</h3>
         <a
-          href="mailto:dlwodu1011@gmail.com"
+          href="mailto:dlwoduq1011@gmail.com"
           className="block text-black hover:underline"
         >
-          dlwodu1011@gmail.com
+          dlwoduq1011@gmail.com
         </a>
       </div>
 

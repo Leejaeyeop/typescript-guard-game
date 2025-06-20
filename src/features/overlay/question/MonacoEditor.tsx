@@ -1,9 +1,16 @@
 "use client";
-import React, { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import Editor, { BeforeMount, OnMount } from "@monaco-editor/react";
 import { useRoundManager } from "@/contexts/round/RoundProvider";
 
 import * as monacoEditor from "monaco-editor";
+import { useTheme } from "next-themes";
 
 interface MonacoEditorProps {
   value: string | null;
@@ -39,6 +46,8 @@ export default function MonacoEditor({
     null
   );
   const { setCorrectAnswer } = useRoundManager();
+
+  const { resolvedTheme } = useTheme();
 
   const handleEditorMount: OnMount = (editor, monaco) => {
     setIsEditorMounted(true);
@@ -93,6 +102,14 @@ export default function MonacoEditor({
     editorRef.current?.revealLine(1);
   }, [value, setCorrectAnswer]);
 
+  const theme = useMemo(() => {
+    if (resolvedTheme === "light") {
+      return "light";
+    } else {
+      return "vs-dark";
+    }
+  }, [resolvedTheme]);
+
   return (
     <figure
       ref={containerRef}
@@ -109,7 +126,7 @@ export default function MonacoEditor({
         defaultLanguage="typescript"
         beforeMount={handleEditorBeforeMount}
         onMount={handleEditorMount}
-        theme="vs-dark"
+        theme={theme}
         options={EDITOR_OPTIONS}
       />
     </figure>
