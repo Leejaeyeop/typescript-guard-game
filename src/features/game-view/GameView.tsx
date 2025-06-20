@@ -26,8 +26,10 @@ export default function GameView({ totalQuizzes }: GameViewProps) {
   return (
     <div id="gameView" className="relative" ref={gameViewRef}>
       {isLoading && (
-        <div className="absolute top-0 z-[999] w-full h-full flex items-center justify-center bg-black">
-          <p className="text-white text-6xl animate-pulse">Loading...</p>
+        <div className="absolute top-0 z-[999] w-full h-full flex items-center justify-center bg-light dark:bg-black">
+          <p className="text-black dark:text-white text-6xl animate-pulse">
+            Loading...
+          </p>
         </div>
       )}
       <StageProvider totalQuizzes={totalQuizzes}>

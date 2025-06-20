@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MedievalSharp } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import ThemeProvider from "@/contexts/theme/ThemeProvider";
 
 const metadataBase = new URL(
   process.env.NEXT_PUBLIC_METADATA_BASE_URL || "http://localhost:3000"
@@ -83,11 +84,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${medievalSharp.className} antialiased bg-black text-white`}
+        className={`${medievalSharp.className} antialiased bg-light dark:bg-black`}
       >
-        {children}
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
