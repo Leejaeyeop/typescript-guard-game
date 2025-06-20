@@ -3,6 +3,7 @@ import { DifficultyLevel } from "@/types/difficultyLevel";
 import { useMenuStore } from "@/store/useMenuStore";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import { MenuButton } from "@/components/ui/button/MenuButton";
+import { MenuTitle } from "@/components/ui/slot/MenuTitle";
 
 export function SelectDifficultyLevel() {
   const { setStageDifficulty, initStage } = useStageManager();
@@ -19,6 +20,7 @@ export function SelectDifficultyLevel() {
 
   return (
     <>
+      <MenuTitle>Select Level</MenuTitle>
       <MenuButton
         aria-label="Beginner"
         onClick={() => onClickHandler("BEGINNER")}

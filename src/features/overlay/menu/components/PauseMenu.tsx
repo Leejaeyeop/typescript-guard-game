@@ -4,6 +4,7 @@ import { useStageManager } from "@/contexts/stage/StageProvider";
 import { useEffect } from "react";
 import { MenuButton } from "@/components/ui/button/MenuButton";
 import { SettingMenu } from "./SettingMenu";
+import { MenuTitle } from "@/components/ui/slot/MenuTitle";
 
 function PauseMenuContent() {
   const { closeMenu } = useMenuStore();
@@ -21,6 +22,7 @@ function PauseMenuContent() {
 
   return (
     <>
+      <MenuTitle>Pause</MenuTitle>
       <MenuButton aria-label="Resume" onClick={cancelPause}>
         Resume
       </MenuButton>

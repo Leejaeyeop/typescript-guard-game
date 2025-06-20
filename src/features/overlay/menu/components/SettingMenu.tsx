@@ -1,5 +1,6 @@
 "use client";
 
+import { MenuTitle } from "@/components/ui/slot/MenuTitle";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -14,6 +15,7 @@ export function SettingMenu() {
   const isDark = theme === "dark";
   return (
     <>
+      <MenuTitle>Settings</MenuTitle>
       <div className="flex justify-center items-center w-full gap-[10%] ">
         <h2>Theme:</h2>
         <label className="inline-flex items-center cursor-pointer">

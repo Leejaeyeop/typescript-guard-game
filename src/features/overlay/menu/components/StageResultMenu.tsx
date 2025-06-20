@@ -3,6 +3,7 @@ import { MenuOverlay, useMenuOverlay } from "../MenuOverlay";
 import { SelectDifficultyLevel } from "./SelectDifficultyLevelMenu";
 import { SCENE_IDS, useAppStore } from "@/store/useAppStore";
 import { useMenuStore } from "@/store/useMenuStore";
+import { MenuTitle } from "@/components/ui/slot/MenuTitle";
 
 interface StageResultMenuProps {
   isFailed: boolean;
@@ -22,6 +23,7 @@ function StageResultMenuContent({
 
   return (
     <>
+      <MenuTitle>Results</MenuTitle>
       {isFailed ? (
         <h2 className="text-2xl text-red-500 mb-3">Failed...</h2>
       ) : (
