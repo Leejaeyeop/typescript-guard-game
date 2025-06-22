@@ -16,7 +16,7 @@ export function SettingMenu() {
   return (
     <>
       <MenuTitle>Settings</MenuTitle>
-      <div className="flex justify-center items-center w-full gap-[10%] ">
+      <div className="flex justify-center items-center w-full gap-[10%] flex-col sm:flex-row">
         <h2>Theme:</h2>
         <label className="inline-flex items-center cursor-pointer">
           <input
