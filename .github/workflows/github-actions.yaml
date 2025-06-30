@@ -3,9 +3,30 @@ name: Convex and Vercel CI
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [*] # 전부
 
 jobs:
+  build-and-test:
+    if: github.event_name == 'pull_request'  # ✅ PR에서만 실행
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Build
+        run: npm run build
+
   check-diff:
+    if: github.event_name == 'push'  
     runs-on: ubuntu-latest
     outputs:
       src_changed: ${{ steps.diff.outputs.src_changed }}
@@ -31,7 +52,7 @@ jobs:
 
   vercel-deployment:
     needs: check-diff
-    if: needs.check-diff.outputs.src_changed == 'true'
+    if: github.event_name == 'push' && needs.check-diff.outputs.src_changed == 'true'
     name: Vercel Production Deployment
     runs-on: ubuntu-latest
     env:
@@ -54,7 +75,7 @@ jobs:
 
   deploy-functions:
     needs: check-diff
-    if: needs.check-diff.outputs.convex_changed == 'true' && needs.check-diff.outputs.src_changed != 'true'
+    if: github.event_name == 'push' && needs.check-diff.outputs.convex_changed == 'true' && needs.check-diff.outputs.src_changed != 'true'
     runs-on: ubuntu-latest
     name: Deploy Convex Functions
     steps:
@@ -71,7 +92,7 @@ jobs:
 
   import-quizzes:
     needs: check-diff
-    if: needs.check-diff.outputs.data_changed == 'true'
+    if: github.event_name == 'push' && needs.check-diff.outputs.data_changed == 'true'
     runs-on: ubuntu-latest
     name: Import Questions + Revalidate
     steps:
