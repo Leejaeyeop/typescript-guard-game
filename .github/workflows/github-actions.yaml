@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [*] # 전부
+    branches: ["**"] # 전부
 
 jobs:
   build-and-test:
-    if: github.event_name == 'pull_request'  # ✅ PR에서만 실행
+    if: github.event_name == 'pull_request' # ✅ PR에서만 실행
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -23,10 +23,12 @@ jobs:
         run: npm ci
 
       - name: Run Build
-        run: npm run build
+        run: |
+          set -e
+          npm run build
 
   check-diff:
-    if: github.event_name == 'push'  
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       src_changed: ${{ steps.diff.outputs.src_changed }}
