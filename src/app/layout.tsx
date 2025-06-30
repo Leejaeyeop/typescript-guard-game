@@ -42,10 +42,6 @@ export const metadata: Metadata = {
   ],
   creator: "Lee jaeyeop",
 
-  icons: {
-    icon: "/favicon.ico",
-  },
-
   openGraph: {
     title: "Type Guard: A TypeScript Quiz Game",
     description:
