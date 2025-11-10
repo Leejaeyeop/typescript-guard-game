@@ -27,6 +27,7 @@ export function ActionButton({
         width={500}
         height={100}
         priority={true} // LCP(Largest Contentful Paint)에 해당할 수 있으므로 유지
+        fetchPriority="high" // 초기 로딩 시 우선순위를 최대로 설정
       />
       {/* 시각적으로는 숨겨지지만 스크린 리더는 읽을 수 있는 텍스트 */}
       <span className="sr-only">{label}</span>
